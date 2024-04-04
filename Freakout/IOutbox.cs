@@ -13,3 +13,4 @@ public abstract class OutboxTask
 {
     public abstract Task ExecuteAsync();
 }
+
