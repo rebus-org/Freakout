@@ -49,7 +49,8 @@ public class SimpleSqlServerPoc : SqlServerFixtureBase
 
         provider.RunBackgroundWorkersAsync(_cancellationTokenSource.Token);
 
-        await AddOutboxCommandAsync(new AppendTextOutboxCommand(Text: "Howdy!"));
+        // pretend something happens somewhere else
+        Task.Run(async () => await AddOutboxCommandAsync(new AppendTextOutboxCommand(Text: "Howdy!")));
 
         await texts.WaitOrDie(
             completionExpression: t => t.Count == 1,
