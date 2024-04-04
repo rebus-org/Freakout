@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Freakout.Tests;
 
 [TestFixture]
-public class ThisIsWhatWeWant : SqlServerFixtureBase
+public class ThisIsWhatWeWant : MsSqlFixtureBase
 {
     string _connectionString;
 
