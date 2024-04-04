@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 Solution Items", "0 Solution Items", "{EE9D4A73-88E4-4CB9-9F82-2750987AAF32}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout", "Freakout\Freakout.csproj", "{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout.Tests", "Freakout.Tests\Freakout.Tests.csproj", "{43EB5546-050B-4F97-9356-68500A979C49}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{C6A7537C-30C3-4485-A507-5E7FF778B93D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{17174961-41CC-4C10-B369-9E4430018A3E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tech", "tech", "{73164D95-FB6C-4389-B86D-38DB4F55A0B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout.MsSql", "Freakout.MsSql\Freakout.MsSql.csproj", "{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43EB5546-050B-4F97-9356-68500A979C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43EB5546-050B-4F97-9356-68500A979C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43EB5546-050B-4F97-9356-68500A979C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43EB5546-050B-4F97-9356-68500A979C49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F05D67A1-BB63-45C1-A0D6-BAEE6A61F43C} = {C6A7537C-30C3-4485-A507-5E7FF778B93D}
+		{43EB5546-050B-4F97-9356-68500A979C49} = {17174961-41CC-4C10-B369-9E4430018A3E}
+		{42137DB3-C2AE-4AC3-A8E6-87BCE3550F1A} = {73164D95-FB6C-4389-B86D-38DB4F55A0B9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {764C61BA-C31B-4E87-BBAF-DCD4EF573CD9}
+	EndGlobalSection
+EndGlobal

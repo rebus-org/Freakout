@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="3.1.0" />
+		<PackageReference Include="microsoft.extensions.hosting" Version="3.1.0" />
+		<PackageReference Include="nito.asyncex" Version="5.1.2" />
+	</ItemGroup>
+
+</Project>
