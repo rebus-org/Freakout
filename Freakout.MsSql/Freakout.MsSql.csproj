@@ -3,10 +3,24 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>12</LangVersion>
+		<Authors>mookid8000</Authors>
+		<Company>Rebus FM ApS</Company>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/rebus-org/Freakout</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="microsoft.data.sqlclient" Version="5.2.0" />
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="microsoft.data.sqlclient" Version="5.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
