@@ -27,8 +27,11 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
     {
         base.SetUp();
 
+        Using(new GlobalsCleaner());
+
         _connectionString = ConnectionString;
         _cancellationTokenSource = Using(new CancellationTokenSource());
+
         Using(new DisposableCallback(_cancellationTokenSource.Cancel));
     }
 
@@ -39,8 +42,11 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
 
         var services = new ServiceCollection();
 
+        // normal stuff
         services.AddLogging(l => l.AddConsole());
         services.AddSingleton(texts);
+        
+        // freakout stuff
         services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString));
         services.AddFreakoutHandler<AppendTextOutboxCommand, AppendTextOutboxCommandHandler>();
 
@@ -67,7 +73,7 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
         await connection.OpenAsync();
 
         await using var transaction = await connection.BeginTransactionAsync();
-        await connection.AddOutboxCommandAsync(command);
+        await connection.AddOutboxCommandAsync(transaction, command);
         await transaction.CommitAsync();
     }
 

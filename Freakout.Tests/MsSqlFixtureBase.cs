@@ -15,11 +15,7 @@ public abstract class MsSqlFixtureBase : FixtureBase
     static readonly Lazy<string> LazyConnectionString = new(() =>
     {
         var connectionString = Environment.GetEnvironmentVariable("MSSQL_TEST_CONNECTIONSTRING");
-
-        if (!string.IsNullOrWhiteSpace(connectionString))
-        {
-            return connectionString;
-        }
+        if (!string.IsNullOrWhiteSpace(connectionString)) return connectionString;
 
         var builder = new MsSqlBuilder();
         var container = builder.Build();

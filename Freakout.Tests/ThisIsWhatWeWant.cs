@@ -44,7 +44,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
         await connection.OpenAsync();
 
         await using var transaction = await connection.BeginTransactionAsync();
-        await connection.AddOutboxCommandAsync(command);
+        await connection.AddOutboxCommandAsync(transaction, command);
         await transaction.CommitAsync();
     }
 

@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Freakout.MsSql;
 
-class MsSqlOutbox(string connectionString) : IOutbox
+class MsSqlOutbox(string connectionString, string tableName, string schemaName) : IOutbox
 {
     public async Task<IReadOnlyList<OutboxTask>> GetPendingOutboxTasksAsync(CancellationToken cancellationToken = default)
     {
@@ -19,7 +19,34 @@ class MsSqlOutbox(string connectionString) : IOutbox
 
         public override async Task ExecuteAsync()
         {
-            
+
         }
+    }
+
+    public void CreateSchema()
+    {
+        using var connection = new SqlConnection(connectionString);
+        
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+
+        command.CommandText = $@"
+
+IF NOT EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}') 
+BEGIN
+    CREATE TABLE [{schemaName}].[{tableName}] (
+        [Id] UNIQUEIDENTIFIER,
+        [Time] DATETIMEOFFSET(3) NOT NULL,
+        [Headers] NVARCHAR(MAX),
+        [Payload] NVARCHAR(MAX),
+        [Completed] BIT NOT NULL DEFAULT(0),
+
+        PRIMARY KEY ([Id])
+    )
+END
+";
+
+        command.ExecuteNonQuery();
     }
 }
