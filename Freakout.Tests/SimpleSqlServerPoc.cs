@@ -73,7 +73,7 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
         await connection.OpenAsync();
 
         await using var transaction = await connection.BeginTransactionAsync();
-        await connection.AddOutboxCommandAsync(transaction, command);
+        await transaction.AddOutboxCommandAsync(command);
         await transaction.CommitAsync();
     }
 

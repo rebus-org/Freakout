@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -11,16 +10,6 @@ class MsSqlOutbox(string connectionString, string tableName, string schemaName) 
     public async Task<IReadOnlyList<OutboxTask>> GetPendingOutboxTasksAsync(CancellationToken cancellationToken = default)
     {
         return new List<OutboxTask>();
-    }
-
-    class MsSqlOutboxTask(Func<CancellationToken, Task> executeAsync, SqlConnection sqlConnection, SqlTransaction sqlTransaction) : OutboxTask
-    {
-
-
-        public override async Task ExecuteAsync()
-        {
-
-        }
     }
 
     public void CreateSchema()
@@ -39,7 +28,7 @@ BEGIN
         [Id] UNIQUEIDENTIFIER,
         [Time] DATETIMEOFFSET(3) NOT NULL,
         [Headers] NVARCHAR(MAX),
-        [Payload] NVARCHAR(MAX),
+        [Payload] VARBINARY(MAX),
         [Completed] BIT NOT NULL DEFAULT(0),
 
         PRIMARY KEY ([Id])
