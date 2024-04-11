@@ -25,7 +25,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
     }
 
     [Test]
-    public async Task METHOD()
+    public async Task MakeItLookPrettyLikeThis()
     {
         // and a modern .NET app
         var services = new ServiceCollection();
@@ -40,7 +40,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
         // in our app we sometimes execute SQL stuff like this
         await AddOutboxCommandAsync(new PrintTextOutboxCommand(Text: "Howdy!"));
 
-        cancellationTokenSource.Cancel();
+        await cancellationTokenSource.CancelAsync();
     }
 
     async Task AddOutboxCommandAsync(object command)
