@@ -17,12 +17,17 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(configuration);
 
         services.AddHostedService(p => new FreakoutBackgroundService(
-            configuration: p.GetRequiredService<FreakoutConfiguration>(),
+            configuration: configuration,
             freakoutDispatcher: p.GetRequiredService<FreakoutDispatcher>(),
             outbox: p.GetRequiredService<IOutbox>(),
             logger: p.GetLoggerFor<FreakoutBackgroundService>(),
             serviceScopeFactory: p.GetRequiredService<IServiceScopeFactory>()
         ));
+
+        services.AddSingleton(configuration.CommandSerializer);
+
+        // this is special and a monster hack: Stuff the command serializer in the background too!
+        Globals.Set(configuration.CommandSerializer);
 
         services.AddSingleton<FreakoutDispatcher>();
 

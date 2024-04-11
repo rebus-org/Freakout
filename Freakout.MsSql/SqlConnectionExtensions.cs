@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Internals;
+using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 
 namespace Freakout.MsSql;
@@ -16,15 +16,15 @@ public static class SqlConnectionExtensions
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         if (command == null) throw new ArgumentNullException(nameof(command));
 
-        var type = command.GetType();
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(command, type);
+        var serializer = Globals.Get<ICommandSerializer>();
+        var serializedCommand = serializer.Serialize(command);
 
-        var headers = new Dictionary<string, string>
-        {
-            [HeaderKeys.Type] = type.GetSimpleAssemblyQualifiedName()
-        };
+        var type = serializedCommand.TypeHeader;
+        var payload = serializedCommand.Payload;
 
-        await Insert(transaction, JsonSerializer.Serialize(headers), bytes, cancellationToken);
+        var headers = new Dictionary<string, string> { [HeaderKeys.Type] = type };
+
+        await Insert(transaction, HeaderSerializer.SerializeToString(headers), payload, cancellationToken);
     }
 
     static async Task Insert(DbTransaction transaction, string headers, byte[] bytes, CancellationToken cancellationToken)

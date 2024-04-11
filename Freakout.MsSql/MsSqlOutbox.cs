@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 using Nito.Disposables;
 // ReSharper disable AccessToDisposedClosure
@@ -40,7 +41,7 @@ class MsSqlOutbox(string connectionString, string tableName, string schemaName) 
             {
                 var id = (Guid)reader["Id"];
                 var time = (DateTimeOffset)reader["Time"];
-                var headers = JsonSerializer.Deserialize<Dictionary<string, string>>((string)reader["Headers"]);
+                var headers = HeaderSerializer.DeserializeFromString((string)reader["Headers"]);
                 var payload = (byte[])reader["Payload"];
 
                 outboxCommands.Add(new MsSqlOutboxCommand(id, time, headers, payload));
