@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Internals.Dispatch;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nito.AsyncEx;
@@ -10,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, FreakoutDispatcher freakoutDispatcher, IOutbox outbox, ILogger<FreakoutBackgroundService> logger, IServiceScopeFactory serviceScopeFactory) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, FreakoutDispatcher freakoutDispatcher, IOutbox outbox, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 

@@ -20,8 +20,7 @@ public static class ServiceCollectionExtensions
             configuration: configuration,
             freakoutDispatcher: p.GetRequiredService<FreakoutDispatcher>(),
             outbox: p.GetRequiredService<IOutbox>(),
-            logger: p.GetLoggerFor<FreakoutBackgroundService>(),
-            serviceScopeFactory: p.GetRequiredService<IServiceScopeFactory>()
+            logger: p.GetLoggerFor<FreakoutBackgroundService>()
         ));
 
         services.AddSingleton(configuration.CommandSerializer);
