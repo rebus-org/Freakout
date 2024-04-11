@@ -11,7 +11,7 @@ namespace Freakout.MsSql;
 
 class MsSqlOutbox(string connectionString, string tableName, string schemaName) : IOutbox
 {
-    readonly string _selectQuery = $"SELECT WITH (ROWLOCK, UPDLOCK) TOP 100 *  FROM [{schemaName}].[{tableName}] WHERE [Completed] = 0 ORDER BY [Id]";
+    readonly string _selectQuery = $"SELECT TOP 100 *  FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK) WHERE [Completed] = 0 ORDER BY [Id]";
 
     public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
     {

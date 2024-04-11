@@ -28,9 +28,9 @@ public static class ServiceCollectionExtensions
         }
     }
 
-    public static void AddFreakoutHandler<TCommand, TCommandHandler>(this IServiceCollection services) where TCommandHandler : ICommandHandler<TCommand>
+    public static void AddFreakoutHandler<TCommand, TCommandHandler>(this IServiceCollection services) where TCommandHandler : class, ICommandHandler<TCommand>
     {
-
+        services.AddScoped<ICommandHandler<TCommand>, TCommandHandler>();
     }
 
 }

@@ -82,11 +82,11 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox out
         using var scope = serviceScopeFactory.CreateScope();
 
         var type = Type.GetType(command.Headers[HeaderKeys.Type]);
-        var commandObject = JsonSerializer.Deserialize(command.Payload, type);
 
         var commandHandlerType = typeof(ICommandHandler<>).MakeGenericType(type);
         dynamic handler = scope.ServiceProvider.GetRequiredService(commandHandlerType);
 
-        await (Task)handler.Handle(commandObject, cancellationToken);
+        var commandObject = JsonSerializer.Deserialize(command.Payload, type);
+        await (Task)handler.HandleAsync(commandObject, cancellationToken);
     }
 }
