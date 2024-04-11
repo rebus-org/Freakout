@@ -30,7 +30,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
         // and a modern .NET app
         var services = new ServiceCollection();
         services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString));
-        services.AddFreakoutHandler<PrintTextOutboxCommand, PrintTextOutboxCommandHandler>();
+        services.AddCommandHandler<PrintTextOutboxCommand, PrintTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
 

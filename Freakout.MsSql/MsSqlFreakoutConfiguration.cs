@@ -10,7 +10,7 @@ public class MsSqlFreakoutConfiguration(string connectionString, bool automatica
 
     public override void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<IOutbox>(p =>
+        services.AddSingleton<IOutbox>(_ =>
         {
             var msSqlOutbox = new MsSqlOutbox(connectionString, TableName, SchemaName);
 

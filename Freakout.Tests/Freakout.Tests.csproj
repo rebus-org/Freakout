@@ -21,4 +21,8 @@
 	  <ProjectReference Include="..\Freakout.MsSql\Freakout.MsSql.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Dispatch\" />
+	</ItemGroup>
+
 </Project>

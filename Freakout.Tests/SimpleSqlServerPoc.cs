@@ -54,7 +54,7 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
 
         // freakout stuff
         services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
-        services.AddFreakoutHandler<AppendTextOutboxCommand, AppendTextOutboxCommandHandler>();
+        services.AddCommandHandler<AppendTextOutboxCommand, AppendTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
 
