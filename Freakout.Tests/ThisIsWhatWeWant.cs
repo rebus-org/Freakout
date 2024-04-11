@@ -34,8 +34,13 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
+        using var cancellationTokenSource = new CancellationTokenSource();
+        _ = provider.RunBackgroundWorkersAsync(cancellationTokenSource.Token);
+
         // in our app we sometimes execute SQL stuff like this
         await AddOutboxCommandAsync(new PrintTextOutboxCommand(Text: "Howdy!"));
+
+        cancellationTokenSource.Cancel();
     }
 
     async Task AddOutboxCommandAsync(object command)

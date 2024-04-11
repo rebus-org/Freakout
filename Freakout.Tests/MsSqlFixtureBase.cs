@@ -41,7 +41,12 @@ public abstract class MsSqlFixtureBase : FixtureBase
         connection.Open();
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"DROP TABLE [{schemaName}].[{tableName}]";
+        command.CommandText = $@"
+IF EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}') 
+BEGIN
+    DROP TABLE [{schemaName}].[{tableName}]
+END
+";
         command.ExecuteNonQuery();
     }
 }
