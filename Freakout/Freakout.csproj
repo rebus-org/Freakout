@@ -10,9 +10,14 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageIcon>freakout.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Include="..\artwork\freakout.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 		<None Include="..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
