@@ -25,5 +25,7 @@ public static class Globals
         {
             Items[index] = null;
         }
+
+        IndexCounter = 0;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nito.AsyncEx;
@@ -8,7 +10,7 @@ using Timer = System.Timers.Timer;
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox outbox, ILogger<FreakoutBackgroundService> logger) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox outbox, ILogger<FreakoutBackgroundService> logger, IServiceScopeFactory serviceScopeFactory) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 
@@ -37,27 +39,27 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox out
 
                 try
                 {
-                    var tasks = await outbox.GetPendingOutboxTasksAsync(stoppingToken);
+                    var batch = await outbox.GetPendingOutboxCommandsAsync(stoppingToken);
 
-                    foreach (var task in tasks)
+                    foreach (var command in batch)
                     {
-                        logger.LogDebug("Executing outbox task {task}", task);
+                        logger.LogDebug("Executing outbox command {command}", command);
 
                         try
                         {
-                            await task.ExecuteAsync();
-                            
-                            logger.LogDebug("Successfully executed outbox task {task}", task);
+                            await ExecuteOutboxCommand(command, stoppingToken);
+
+                            logger.LogDebug("Successfully executed outbox command {command}", command);
                         }
                         catch (Exception exception)
                         {
-                            throw new ApplicationException($"Could not execute outbox task {task}", exception);
+                            throw new ApplicationException($"Could not execute outbox command {command}", exception);
                         }
                     }
                 }
                 catch (Exception exception)
                 {
-                    logger.LogError(exception, "Error when executing outbox tasks");
+                    logger.LogError(exception, "Error when executing outbox commands");
                 }
             }
         }
@@ -73,5 +75,18 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox out
         {
             logger.LogInformation("Freakout background worker stopped");
         }
+    }
+
+    async Task ExecuteOutboxCommand(OutboxCommand command, CancellationToken cancellationToken)
+    {
+        using var scope = serviceScopeFactory.CreateScope();
+
+        var type = Type.GetType(command.Headers[HeaderKeys.Type]);
+        var commandObject = JsonSerializer.Deserialize(command.Payload, type);
+
+        var commandHandlerType = typeof(ICommandHandler<>).MakeGenericType(type);
+        dynamic handler = scope.ServiceProvider.GetRequiredService(commandHandlerType);
+
+        await (Task)handler.Handle(commandObject, cancellationToken);
     }
 }

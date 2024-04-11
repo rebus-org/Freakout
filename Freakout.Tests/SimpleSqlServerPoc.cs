@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
@@ -45,9 +46,9 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
         // normal stuff
         services.AddLogging(l => l.AddConsole());
         services.AddSingleton(texts);
-        
+
         // freakout stuff
-        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString));
+        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
         services.AddFreakoutHandler<AppendTextOutboxCommand, AppendTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();

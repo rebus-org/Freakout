@@ -15,7 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(p => new FreakoutBackgroundService(
             configuration: p.GetRequiredService<FreakoutConfiguration>(),
             outbox: p.GetRequiredService<IOutbox>(),
-            logger: p.GetLoggerFor<FreakoutBackgroundService>()
+            logger: p.GetLoggerFor<FreakoutBackgroundService>(),
+            serviceScopeFactory: p.GetRequiredService<IServiceScopeFactory>()
         ));
 
         configuration.ConfigureServices(services);

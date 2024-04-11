@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="3.1.0" />
 		<PackageReference Include="microsoft.extensions.hosting" Version="3.1.0" />
 		<PackageReference Include="nito.asyncex" Version="5.1.2" />
