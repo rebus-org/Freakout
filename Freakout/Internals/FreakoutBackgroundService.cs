@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +57,8 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox out
                             throw new ApplicationException($"Could not execute outbox command {command}", exception);
                         }
                     }
+
+                    await batch.CompleteAsync(stoppingToken);
                 }
                 catch (Exception exception)
                 {
@@ -79,14 +82,26 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutbox out
 
     async Task ExecuteOutboxCommand(OutboxCommand command, CancellationToken cancellationToken)
     {
-        using var scope = serviceScopeFactory.CreateScope();
-
         var type = Type.GetType(command.Headers[HeaderKeys.Type]);
 
-        var commandHandlerType = typeof(ICommandHandler<>).MakeGenericType(type);
-        dynamic handler = scope.ServiceProvider.GetRequiredService(commandHandlerType);
+        var genericExecuteMethod = GetType().GetMethod(nameof(ExecuteOutboxCommandGeneric), BindingFlags.Instance | BindingFlags.NonPublic)?.MakeGenericMethod(type)
+            ?? throw new ArgumentException("Could not get generic method for some reason");
 
         var commandObject = JsonSerializer.Deserialize(command.Payload, type);
-        await (Task)handler.HandleAsync(commandObject, cancellationToken);
+
+        var executeTask = (Task)genericExecuteMethod.Invoke(this, new object[] { commandObject, cancellationToken });
+
+        await executeTask;
+
     }
+
+    async Task ExecuteOutboxCommandGeneric<TCommand>(TCommand command, CancellationToken cancellationToken)
+    {
+        using var scope = serviceScopeFactory.CreateScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<TCommand>>();
+
+        await handler.HandleAsync(command, cancellationToken);
+    }
+
 }

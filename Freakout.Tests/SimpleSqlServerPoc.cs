@@ -26,11 +26,16 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
 
     protected override void SetUp()
     {
+        Using(new DisposableCallback(() => DropTable("OutboxCommands")));
+
         base.SetUp();
 
         Using(new GlobalsCleaner());
 
         _connectionString = ConnectionString;
+
+        DropTable("OutboxCommands");
+
         _cancellationTokenSource = Using(new CancellationTokenSource());
 
         Using(new DisposableCallback(_cancellationTokenSource.Cancel));
@@ -62,7 +67,7 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
             completionExpression: t => t.Count == 1,
             failExpression: t => t.Count > 1,
             failureDetailsFunction: () =>
-                "Text was not appended as expected - expected one single 'Howdy!' to have been appended"
+                $"Text was not appended as expected - expected one single 'Howdy!' to have been appended, but we got this: {string.Join(", ", texts)}"
         );
 
         Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));

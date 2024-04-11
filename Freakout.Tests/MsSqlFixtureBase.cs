@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Data.SqlClient;
 using Nito.AsyncEx.Synchronous;
 using Nito.Disposables;
 using NUnit.Framework;
@@ -31,4 +32,16 @@ public abstract class MsSqlFixtureBase : FixtureBase
 
     [OneTimeTearDown]
     public void CleanUp() => Disposables.Dispose();
+
+    protected void DropTable(string tableName) => DropTable("dbo", tableName);
+
+    protected void DropTable(string schemaName, string tableName)
+    {
+        using var connection = new SqlConnection(ConnectionString);
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = $"DROP TABLE [{schemaName}].[{tableName}]";
+        command.ExecuteNonQuery();
+    }
 }

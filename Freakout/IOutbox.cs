@@ -13,6 +13,8 @@ public interface IOutbox
 
 public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync) : IEnumerable<OutboxCommand>
 {
+    public static readonly OutboxCommandBatch Empty = new(Array.Empty<OutboxCommand>(), _ => Task.CompletedTask);
+
     public Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
     public IEnumerator<OutboxCommand> GetEnumerator() => outboxCommands.GetEnumerator();
