@@ -10,14 +10,14 @@ public interface IFreakoutSystemFactory : IDisposable
     Task<FreakoutSystem> CreateAsync();
 }
 
-public record FreakoutSystem(
-    IServiceProvider ServiceProvider,
-    IOutbox Outbox,
-    IOutboxCommandStore OutboxCommandStore
-)
+public class FreakoutSystem(IServiceProvider ServiceProvider)
 {
     /// <summary>
     /// HACK: Resolve this one, so the container owns it and will clean the globals on disposal
     /// </summary>
     readonly object _ = ServiceProvider.GetRequiredService<GlobalsClearer>();
+
+    public IOutbox Outbox => ServiceProvider.GetRequiredService<IOutbox>();
+    
+    public IOutboxCommandStore OutboxCommandStore => ServiceProvider.GetRequiredService<IOutboxCommandStore>();
 }

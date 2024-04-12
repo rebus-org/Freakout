@@ -6,23 +6,23 @@ using Testy.General;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-namespace Freakout.MsSql.Tests;
+namespace Freakout.NpgSql.Tests;
 
-public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
+public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
 {
     readonly CollectionDisposable disposables = new();
 
     public async Task<FreakoutSystem> CreateAsync()
     {
-        var tableName = $"outbox-{Guid.NewGuid():N}";
-
-        disposables.Add(new DisposableCallback(() => MsSqlTestHelper.DropTable(tableName)));
-
         var services = new ServiceCollection();
 
-        var configuration = new MsSqlFreakoutConfiguration(MsSqlTestHelper.ConnectionString)
+        var tableName = $"outbox-{Guid.NewGuid():N}";
+
+        disposables.Add(new DisposableCallback(() => NpgSqlTestHelper.DropTable(tableName)));
+
+        var configuration = new NpgSqlFreakoutConfiguration(NpgSqlTestHelper.ConnectionString)
         {
-            TableName = tableName
+            OutboxPollInterval = TimeSpan.FromSeconds(1),
         };
 
         services.AddFreakout(configuration);
@@ -31,8 +31,11 @@ public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
 
         disposables.Add(provider);
 
-        return new (provider);
+        return new(provider);
     }
 
-    public void Dispose() => disposables.Dispose();
+    public void Dispose()
+    {
+
+    }
 }

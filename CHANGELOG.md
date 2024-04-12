@@ -20,3 +20,6 @@
 
 ## 0.0.7
 * Add `IOutbox` interface so outbox commands can be stored in a tech agnostic way
+
+## 0.0.8
+* NpgSQL outbox!

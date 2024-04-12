@@ -44,6 +44,12 @@ if %ERRORLEVEL% neq 0 (
  	goto exit_fail
 )
 
+dotnet pack Freakout.NpgSql -c Release -o "%deploydir%" -p:PackageVersion=%version% --no-restore
+if %ERRORLEVEL% neq 0 (
+	popd
+ 	goto exit_fail
+)
+
 call scripts\push.cmd "%version%"
 
 popd

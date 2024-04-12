@@ -6,9 +6,7 @@ namespace Freakout.MsSql;
 /// Freakout configuration for using Microsoft SQL Server as the store.
 /// </summary>
 /// <param name="connectionString">Configures the connection string to use to connect to SQL Server</param>
-/// <param name="automaticallyCreateSchema">Specifies whether the store table should be automaticallly created if it doesn't exist</param>
-/// <param name="processingBatchSize">Configures the command processing batch size. Defaults to 1</param>
-public class MsSqlFreakoutConfiguration(string connectionString, bool automaticallyCreateSchema = true, int processingBatchSize = 1) : FreakoutConfiguration
+public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfiguration
 {
     /// <summary>
     /// Configures the store table schema name. Defaults to "dbo".
@@ -20,13 +18,24 @@ public class MsSqlFreakoutConfiguration(string connectionString, bool automatica
     /// </summary>
     public string TableName { get; set; } = "OutboxCommands";
 
-    internal override void ConfigureServices(IServiceCollection services)
+    /// <summary>
+    /// Configures whether the schema should be created automatically
+    /// </summary>
+    public bool AutomaticallyCreateSchema { get; set; } = true;
+
+    /// <summary>
+    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch.
+    /// </summary>
+    public int CommandProcessingBatchSize { get; set; } = 1;
+
+    /// <inheritdoc />
+    protected override void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
-            var msSqlOutbox = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, processingBatchSize);
+            var msSqlOutbox = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
 
-            if (automaticallyCreateSchema)
+            if (AutomaticallyCreateSchema)
             {
                 msSqlOutbox.CreateSchema();
             }

@@ -11,7 +11,18 @@ namespace Freakout;
 /// </summary>
 public abstract class FreakoutConfiguration
 {
-    internal abstract void ConfigureServices(IServiceCollection services);
+    internal void InvokeConfigureServices(IServiceCollection services) => ConfigureServices(services);
+
+    /// <summary>
+    /// Must carry out the necessary registrations in <paramref name="services"/> to be able to work.
+    /// At a minimum, this includes registrations for
+    /// <list type="bullet">
+    /// <item><see cref="IOutbox"/></item>
+    /// <item><see cref="IOutboxCommandStore"/></item>
+    /// </list>
+    /// and then whatever stuff the selected type of persistence needs to do its thing.
+    /// </summary>
+    protected abstract void ConfigureServices(IServiceCollection services);
 
     /// <summary>
     /// Configures the poll interval, i.e. how long to wait between polling the store for pending commands.

@@ -47,7 +47,7 @@ public static class FreakoutServiceCollectionExtensions
         services.AddSingleton<IOutboxCommandDispatcher, FreakoutOutboxCommandDispatcher>();
 
         // let the concrete configuration make its registrations
-        configuration.ConfigureServices(services);
+        configuration.InvokeConfigureServices(services);
 
         // must have IOutboxCommandStore implementation now
         if (!services.Any(s => s.ServiceType == typeof(IOutboxCommandStore)))

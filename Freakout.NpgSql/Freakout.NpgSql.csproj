@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net6.0;net462</TargetFrameworks>
+		<LangVersion>12</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Freakout\Freakout.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="npgsql" Version="8.0.2" />
+	</ItemGroup>
+
+</Project>

@@ -42,7 +42,9 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveSingleCommand()
     {
-        var (_, outbox, commandStore) = await _factory.CreateAsync();
+        var system = await _factory.CreateAsync();
+        var commandStore = system.OutboxCommandStore;
+        var outbox = system.Outbox;
 
         await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
 
@@ -58,7 +60,9 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommands()
     {
-        var (_, outbox, commandStore) = await _factory.CreateAsync();
+        var system = await _factory.CreateAsync();
+        var commandStore = system.OutboxCommandStore;
+        var outbox = system.Outbox;
 
         await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
         await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
@@ -80,7 +84,9 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommandsParallel()
     {
-        var (_, outbox, commandStore) = await _factory.CreateAsync();
+        var system = await _factory.CreateAsync();
+        var commandStore = system.OutboxCommandStore;
+        var outbox = system.Outbox;
 
         await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
         await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
