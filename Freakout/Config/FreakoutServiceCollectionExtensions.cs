@@ -20,19 +20,29 @@ public static class FreakoutServiceCollectionExtensions
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+        if (Globals.Get<FreakoutConfiguration>() != null)
+        {
+            throw new InvalidOperationException(
+                $"Found global FreakoutConfiguration {Globals.Get<FreakoutConfiguration>()} - unfortunately, it's not possible to run two Freakout instances in the same process at the same time");
+        }
+
         services.AddSingleton(configuration);
 
-        services.AddHostedService(p => new FreakoutBackgroundService(
-            configuration: configuration,
-            freakoutDispatcher: p.GetRequiredService<IOutboxCommandDispatcher>(),
-            store: p.GetRequiredService<IOutboxCommandStore>(),
-            logger: p.GetLoggerFor<FreakoutBackgroundService>()
-        ));
+        services.AddHostedService(p =>
+        {
+            // HACK: Resolve the globals cleaner to make the container own it and therefore dispose it
+            _ = p.GetRequiredService<GlobalsClearer>();
+
+            var freakoutBackgroundService = new FreakoutBackgroundService(
+                configuration: configuration,
+                dispatcher: p.GetRequiredService<IOutboxCommandDispatcher>(),
+                store: p.GetRequiredService<IOutboxCommandStore>(),
+                logger: p.GetLoggerFor<FreakoutBackgroundService>()
+            );
+            return freakoutBackgroundService;
+        });
 
         services.AddSingleton(configuration.CommandSerializer);
-
-        // this is special and a monster hack: Stuff the configuration in the globals!
-        Globals.Set(configuration);
 
         services.AddSingleton<IOutboxCommandDispatcher, FreakoutOutboxCommandDispatcher>();
 
@@ -50,6 +60,11 @@ public static class FreakoutServiceCollectionExtensions
         {
             throw new ApplicationException($"The configuration {configuration} did not make the necessary IOutbox registration");
         }
+
+        // this is special and a monster hack: Stuff the configuration in the globals!
+        Globals.Set(configuration);
+
+        services.AddSingleton(_ => new GlobalsClearer());
     }
 
     /// <summary>

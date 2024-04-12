@@ -13,7 +13,7 @@ namespace Freakout.MsSql;
 
 class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutboxCommandStore
 {
-    readonly string _selectQuery = $"SELECT TOP {processingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK) WHERE [Completed] = 0 ORDER BY [Id]";
+    readonly string _selectQuery = $"SELECT TOP {processingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK, READPAST) WHERE [Completed] = 0 ORDER BY [Id]";
 
     public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
     {

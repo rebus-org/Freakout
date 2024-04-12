@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 // ReSharper disable StaticMemberInGenericType
 // ReSharper disable ClassNeverInstantiated.Local
+// ReSharper disable UnusedTypeParameter
 
 namespace Freakout.Internals;
 
@@ -27,6 +29,8 @@ public static class Globals
     {
         internal static readonly int Index = Interlocked.Increment(ref IndexCounter);
     }
+
+    internal static object[] GetAll() => Items.Where(i => i != null).ToArray();
 
     internal static void Clear()
     {

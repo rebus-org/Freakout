@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Freakout.Internals;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.Tests.Contracts;
 
@@ -9,6 +11,13 @@ public interface IFreakoutSystemFactory : IDisposable
 }
 
 public record FreakoutSystem(
+    IServiceProvider ServiceProvider,
     IOutbox Outbox,
     IOutboxCommandStore OutboxCommandStore
-);
+)
+{
+    /// <summary>
+    /// HACK: Resolve this one, so the container owns it and will clean the globals on disposal
+    /// </summary>
+    readonly object _ = ServiceProvider.GetRequiredService<GlobalsClearer>();
+}

@@ -34,7 +34,7 @@ public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
         var outbox = provider.GetRequiredService<IOutbox>();
         var commandStore = provider.GetRequiredService<IOutboxCommandStore>();
 
-        return new FreakoutSystem(outbox, commandStore);
+        return new FreakoutSystem(provider, outbox, commandStore);
     }
 
     public void Dispose() => disposables.Dispose();

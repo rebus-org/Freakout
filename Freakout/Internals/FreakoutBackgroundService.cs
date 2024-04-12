@@ -6,10 +6,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nito.AsyncEx;
 using Timer = System.Timers.Timer;
+// ReSharper disable UseAwaitUsing
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher freakoutDispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher dispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 
@@ -46,7 +47,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
 
                         try
                         {
-                            await freakoutDispatcher.ExecuteAsync(command, stoppingToken);
+                            await dispatcher.ExecuteAsync(command, stoppingToken);
 
                             logger.LogDebug("Successfully executed store command {command}", command);
                         }
