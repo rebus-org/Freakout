@@ -114,18 +114,7 @@ SCOPE 'Dispatch 10000000 commands' completed in 30029,7693 ms | 0,00300297693 ms
         }
     }
 
-    OutboxCommand GetOutboxCommand(object command)
-    {
-        var serializedCommand = _serializer.Serialize(command);
-        var headers = new Dictionary<string, string>() { [HeaderKeys.Type] = serializedCommand.TypeHeader, };
-        var payload = serializedCommand.Payload;
-
-        return new OutboxCommand(
-            Time: DateTimeOffset.Now,
-            Headers: headers,
-            Payload: payload
-        );
-    }
+    OutboxCommand GetOutboxCommand(object command) => _serializer.Serialize(command);
 
     record SomeCommand;
 

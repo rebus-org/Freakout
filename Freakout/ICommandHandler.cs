@@ -14,5 +14,8 @@ public interface ICommandHandler { }
 /// </summary>
 public interface ICommandHandler<in TCommand> : ICommandHandler
 {
+    /// <summary>
+    /// Handler method that will be called by Freakout
+    /// </summary>
     Task HandleAsync(TCommand command, CancellationToken cancellationToken);
 }

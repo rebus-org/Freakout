@@ -6,12 +6,22 @@ using System.Threading.Tasks;
 
 namespace Freakout;
 
+/// <summary>
+/// Represents a batch of outbox commands to be processed. When completed without errors, Freakout will call its completion method, which
+/// should cause the outbox to mark the contained commands as handled.
+/// </summary>
 public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync) : IEnumerable<OutboxCommand>
 {
+    /// <summary>
+    /// Gets an empty <see cref="OutboxCommandBatch"/>
+    /// </summary>
     public static readonly OutboxCommandBatch Empty = new(Array.Empty<OutboxCommand>(), _ => Task.CompletedTask);
 
-    public Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
+    internal Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
+    /// <summary>
+    /// Gets an enumerator for the contained outbox commands
+    /// </summary>
     public IEnumerator<OutboxCommand> GetEnumerator() => outboxCommands.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 using Freakout.Internals;
 using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
+// ReSharper disable UseAwaitUsing
 
 namespace Freakout.MsSql;
 
-public static class SqlConnectionExtensions
+/// <summary>
+/// Relevant extension methods for working with outbox commands in Microsoft SQL Server
+/// </summary>
+public static class FreakoutSqlConnectionExtensions
 {
-    public static async Task AddOutboxCommandAsync(this DbTransaction transaction, object command, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Adds the given <paramref name="command"/> to the outbox as par of the SQL transaction. The command will be added to the outbox
+    /// when the transaction is committed.
+    /// </summary>
+    public static async Task AddOutboxCommandAsync(this DbTransaction transaction, object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         if (command == null) throw new ArgumentNullException(nameof(command));
@@ -19,17 +27,17 @@ public static class SqlConnectionExtensions
         var serializer = Globals.Get<ICommandSerializer>();
         var serializedCommand = serializer.Serialize(command);
 
-        var type = serializedCommand.TypeHeader;
         var payload = serializedCommand.Payload;
+        var headersToUse = serializedCommand.Headers;
 
-        var headers = new Dictionary<string, string> { [HeaderKeys.Type] = type };
+        headers?.InsertInto(headersToUse);
 
         await Insert(transaction, HeaderSerializer.SerializeToString(headers), payload, cancellationToken);
     }
 
     static async Task Insert(DbTransaction transaction, string headers, byte[] bytes, CancellationToken cancellationToken)
     {
-        var connection = transaction.Connection;
+        var connection = transaction.Connection ?? throw new ArgumentException($"The {transaction} did not have a DbConnection on it!");
 
         using var cmd = connection.CreateCommand();
 

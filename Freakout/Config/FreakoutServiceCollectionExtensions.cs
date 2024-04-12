@@ -7,8 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.Config;
 
-public static class ServiceCollectionExtensions
+/// <summary>
+/// Configuration extensions for Freakout
+/// </summary>
+public static class FreakoutServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adds Freakout to the container, using the given <paramref name="configuration"/>.
+    /// </summary>
     public static void AddFreakout(this IServiceCollection services, FreakoutConfiguration configuration)
     {
         if (services == null) throw new ArgumentNullException(nameof(services));

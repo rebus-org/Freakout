@@ -11,3 +11,6 @@
 
 ## 0.0.4
 * Add XML docs
+
+## 0.0.5
+* Write the XML docs ;)
