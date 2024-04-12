@@ -11,12 +11,12 @@ using Microsoft.Data.SqlClient;
 namespace Freakout.MsSql;
 
 /// <summary>
-/// Relevant extension methods for working with outbox commands in Microsoft SQL Server
+/// Relevant extension methods for working with store commands in Microsoft SQL Server
 /// </summary>
 public static class FreakoutSqlConnectionExtensions
 {
     /// <summary>
-    /// Adds the given <paramref name="command"/> to the outbox as par of the SQL transaction. The command will be added to the outbox
+    /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
     /// when the transaction is committed.
     /// </summary>
     public static async Task AddOutboxCommandAsync(this DbTransaction transaction, object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)

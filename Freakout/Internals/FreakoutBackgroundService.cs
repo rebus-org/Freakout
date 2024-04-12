@@ -9,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher freakoutDispatcher, IOutbox outbox, ILogger<FreakoutBackgroundService> logger) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher freakoutDispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 
@@ -23,7 +23,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
 
         timer.Elapsed += (_, _) =>
         {
-            logger.LogDebug("Triggering outbox poll");
+            logger.LogDebug("Triggering store poll");
             AutoResetEvent.Set();
         };
         timer.Start();
@@ -34,25 +34,25 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
             {
                 await AutoResetEvent.WaitAsync(stoppingToken);
 
-                logger.LogDebug("Polling outbox");
+                logger.LogDebug("Polling store");
 
                 try
                 {
-                    var batch = await outbox.GetPendingOutboxCommandsAsync(stoppingToken);
+                    var batch = await store.GetPendingOutboxCommandsAsync(stoppingToken);
 
                     foreach (var command in batch)
                     {
-                        logger.LogDebug("Executing outbox command {command}", command);
+                        logger.LogDebug("Executing store command {command}", command);
 
                         try
                         {
                             await freakoutDispatcher.ExecuteAsync(command, stoppingToken);
 
-                            logger.LogDebug("Successfully executed outbox command {command}", command);
+                            logger.LogDebug("Successfully executed store command {command}", command);
                         }
                         catch (Exception exception)
                         {
-                            throw new ApplicationException($"Could not execute outbox command {command}", exception);
+                            throw new ApplicationException($"Could not execute store command {command}", exception);
                         }
                     }
 
@@ -60,7 +60,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
                 }
                 catch (Exception exception)
                 {
-                    logger.LogError(exception, "Error when executing outbox commands");
+                    logger.LogError(exception, "Error when executing store commands");
                 }
             }
         }

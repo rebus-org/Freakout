@@ -14,7 +14,7 @@ public abstract class FreakoutConfiguration
     internal abstract void ConfigureServices(IServiceCollection services);
 
     /// <summary>
-    /// Configures the poll interval, i.e. how long to wait between polling the outbox for pending commands.
+    /// Configures the poll interval, i.e. how long to wait between polling the store for pending commands.
     /// </summary>
     public TimeSpan OutboxPollInterval { get; set; } = TimeSpan.FromMinutes(1);
 

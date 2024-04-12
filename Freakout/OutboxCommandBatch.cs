@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Freakout;
 
 /// <summary>
-/// Represents a batch of outbox commands to be processed. When completed without errors, Freakout will call its completion method, which
-/// should cause the outbox to mark the contained commands as handled.
+/// Represents a batch of store commands to be processed. When completed without errors, Freakout will call its completion method, which
+/// should cause the store to mark the contained commands as handled.
 /// </summary>
 public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync) : IEnumerable<OutboxCommand>
 {
@@ -20,7 +20,7 @@ public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<
     internal Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
     /// <summary>
-    /// Gets an enumerator for the contained outbox commands
+    /// Gets an enumerator for the contained store commands
     /// </summary>
     public IEnumerator<OutboxCommand> GetEnumerator() => outboxCommands.GetEnumerator();
 

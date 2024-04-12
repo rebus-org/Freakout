@@ -25,7 +25,7 @@ public static class FreakoutServiceCollectionExtensions
         services.AddHostedService(p => new FreakoutBackgroundService(
             configuration: configuration,
             freakoutDispatcher: p.GetRequiredService<IOutboxCommandDispatcher>(),
-            outbox: p.GetRequiredService<IOutbox>(),
+            store: p.GetRequiredService<IOutboxCommandStore>(),
             logger: p.GetLoggerFor<FreakoutBackgroundService>()
         ));
 
@@ -40,7 +40,7 @@ public static class FreakoutServiceCollectionExtensions
         configuration.ConfigureServices(services);
 
         // must have IOutbox implementation now
-        if (!services.Any(s => s.ServiceType == typeof(IOutbox)))
+        if (!services.Any(s => s.ServiceType == typeof(IOutboxCommandStore)))
         {
             throw new ApplicationException($"The configuration {configuration} did not make the necessary IOutbox registration");
         }

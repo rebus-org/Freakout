@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Freakout.Serialization;
 
 /// <summary>
-/// Built-in header serializer. This is just how outbox command headers are serialized. Uses System.Text.Json internally.
+/// Built-in header serializer. This is just how store command headers are serialized. Uses System.Text.Json internally.
 /// </summary>
 public static class HeaderSerializer
 {

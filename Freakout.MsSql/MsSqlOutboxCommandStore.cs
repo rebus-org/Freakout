@@ -11,7 +11,7 @@ using Nito.Disposables;
 
 namespace Freakout.MsSql;
 
-class MsSqlOutbox(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutbox
+class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutboxCommandStore
 {
     readonly string _selectQuery = $"SELECT TOP {processingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK) WHERE [Completed] = 0 ORDER BY [Id]";
 
@@ -69,7 +69,7 @@ class MsSqlOutbox(string connectionString, string tableName, string schemaName, 
         catch (Exception exception)
         {
             disposables.Dispose();
-            throw new ApplicationException("Could not get outbox tasks", exception);
+            throw new ApplicationException("Could not get store tasks", exception);
         }
     }
 
