@@ -9,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, FreakoutDispatcher freakoutDispatcher, IOutbox outbox, ILogger<FreakoutBackgroundService> logger) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher freakoutDispatcher, IOutbox outbox, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 

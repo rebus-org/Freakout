@@ -7,6 +7,7 @@ using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 using Nito.Disposables;
 // ReSharper disable AccessToDisposedClosure
+// ReSharper disable UseAwaitUsing
 
 namespace Freakout.MsSql;
 
@@ -53,8 +54,17 @@ class MsSqlOutbox(string connectionString, string tableName, string schemaName, 
 
             return new OutboxCommandBatch(
                 outboxCommands: outboxCommands,
-                completeAsync: token => CompleteAsync(disposables, connection, transaction, outboxCommands, token)
-            );
+                completeAsync: async token =>
+                {
+                    try
+                    {
+                        await CompleteAsync(connection, transaction, outboxCommands, token);
+                    }
+                    finally
+                    {
+                        disposables.Dispose();
+                    }
+                });
         }
         catch (Exception exception)
         {
@@ -63,23 +73,16 @@ class MsSqlOutbox(string connectionString, string tableName, string schemaName, 
         }
     }
 
-    async Task CompleteAsync(CollectionDisposable disposables, SqlConnection connection, SqlTransaction transaction, List<MsSqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
+    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<MsSqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
-        try
-        {
-            var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
+        var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
-            using var command = connection.CreateCommand();
-            command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1 WHERE [Id] IN ({ids})";
-            command.Transaction = transaction;
-            await command.ExecuteNonQueryAsync(cancellationToken);
+        using var command = connection.CreateCommand();
+        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1 WHERE [Id] IN ({ids})";
+        command.Transaction = transaction;
+        await command.ExecuteNonQueryAsync(cancellationToken);
 
-            transaction.Commit();
-        }
-        finally
-        {
-            disposables.Dispose();
-        }
+        transaction.Commit();
     }
 
     public void CreateSchema()

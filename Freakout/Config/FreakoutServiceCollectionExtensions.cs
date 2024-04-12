@@ -24,7 +24,7 @@ public static class FreakoutServiceCollectionExtensions
 
         services.AddHostedService(p => new FreakoutBackgroundService(
             configuration: configuration,
-            freakoutDispatcher: p.GetRequiredService<FreakoutDispatcher>(),
+            freakoutDispatcher: p.GetRequiredService<IOutboxCommandDispatcher>(),
             outbox: p.GetRequiredService<IOutbox>(),
             logger: p.GetLoggerFor<FreakoutBackgroundService>()
         ));
@@ -34,7 +34,7 @@ public static class FreakoutServiceCollectionExtensions
         // this is special and a monster hack: Stuff the command serializer in the background too!
         Globals.Set(configuration.CommandSerializer);
 
-        services.AddSingleton<FreakoutDispatcher>();
+        services.AddSingleton<IOutboxCommandDispatcher, FreakoutOutboxCommandDispatcher>();
 
         // let the concrete configuration make its registrations
         configuration.ConfigureServices(services);

@@ -14,3 +14,6 @@
 
 ## 0.0.5
 * Write the XML docs ;)
+
+## 0.0.6
+* Pull dispatcher out, so it can be decorated (e.g. to implement Polly-based retries)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
@@ -15,7 +14,7 @@ using Testy;
 namespace Freakout.Tests.Dispatch;
 
 [TestFixture]
-public class TestFreakoutDispatcher : FixtureBase
+public class TestFreakoutOutboxCommandDispatcher : FixtureBase
 {
     SystemTextJsonCommandSerializer _serializer;
 
@@ -33,7 +32,7 @@ public class TestFreakoutDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(() => dispatcher.ExecuteAsync(GetOutboxCommand(new SomeCommand())));
 
@@ -52,7 +51,7 @@ public class TestFreakoutDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej")));
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej med dig")));
@@ -101,7 +100,7 @@ SCOPE 'Dispatch 10000000 commands' completed in 30029,7693 ms | 0,00300297693 ms
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         using var _ = TimerScope($"Dispatch {count} commands", count);
 

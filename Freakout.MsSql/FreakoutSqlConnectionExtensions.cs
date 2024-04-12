@@ -32,7 +32,7 @@ public static class FreakoutSqlConnectionExtensions
 
         headers?.InsertInto(headersToUse);
 
-        await Insert(transaction, HeaderSerializer.SerializeToString(headers), payload, cancellationToken);
+        await Insert(transaction, HeaderSerializer.SerializeToString(headersToUse), payload, cancellationToken);
     }
 
     static async Task Insert(DbTransaction transaction, string headers, byte[] bytes, CancellationToken cancellationToken)
