@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Testy;
 using Testy.Extensions;
 using Testy.General;
 using CancellationTokenSource = System.Threading.CancellationTokenSource;
@@ -16,22 +17,22 @@ using CancellationTokenSource = System.Threading.CancellationTokenSource;
 namespace Freakout.MsSql.Tests;
 
 [TestFixture]
-public class SimpleSqlServerPoc : MsSqlFixtureBase
+public class SimpleSqlServerPoc : FixtureBase
 {
     string _connectionString;
     CancellationTokenSource _cancellationTokenSource;
 
     protected override void SetUp()
     {
-        Using(new DisposableCallback(() => DropTable("OutboxCommands")));
+        Using(new DisposableCallback(() => MsSqlTestHelper.DropTable("OutboxCommands")));
 
         base.SetUp();
 
         Using(new GlobalsCleaner());
 
-        _connectionString = ConnectionString;
+        _connectionString = MsSqlTestHelper.ConnectionString;
 
-        DropTable("OutboxCommands");
+        MsSqlTestHelper.DropTable("OutboxCommands");
 
         _cancellationTokenSource = Using(new CancellationTokenSource());
 

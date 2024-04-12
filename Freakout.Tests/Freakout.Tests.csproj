@@ -21,4 +21,8 @@
 	  <ProjectReference Include="..\Freakout\Freakout.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Contracts\" />
+	</ItemGroup>
+
 </Project>

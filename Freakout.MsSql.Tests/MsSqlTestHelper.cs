@@ -3,12 +3,11 @@ using Nito.AsyncEx.Synchronous;
 using Nito.Disposables;
 using NUnit.Framework;
 using Testcontainers.MsSql;
-using Testy;
 
 namespace Freakout.MsSql.Tests;
 
 [SetUpFixture]
-public abstract class MsSqlFixtureBase : FixtureBase
+class MsSqlTestHelper
 {
     static readonly CollectionDisposable Disposables = new();
 
@@ -27,14 +26,14 @@ public abstract class MsSqlFixtureBase : FixtureBase
         return container.GetConnectionString();
     });
 
-    protected string ConnectionString => LazyConnectionString.Value;
+    public static string ConnectionString => LazyConnectionString.Value;
 
     [OneTimeTearDown]
     public void CleanUp() => Disposables.Dispose();
 
-    protected void DropTable(string tableName) => DropTable("dbo", tableName);
+    public static void DropTable(string tableName) => DropTable("dbo", tableName);
 
-    protected void DropTable(string schemaName, string tableName)
+    public static void DropTable(string schemaName, string tableName)
     {
         using var connection = new SqlConnection(ConnectionString);
         connection.Open();
@@ -48,4 +47,5 @@ END
 ";
         command.ExecuteNonQuery();
     }
+
 }

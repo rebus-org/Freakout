@@ -3,6 +3,7 @@ using Freakout.Tests;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Testy;
 
 // ReSharper disable ClassNeverInstantiated.Local
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -10,7 +11,7 @@ using NUnit.Framework;
 namespace Freakout.MsSql.Tests;
 
 [TestFixture]
-public class ThisIsWhatWeWant : MsSqlFixtureBase
+public class ThisIsWhatWeWant : FixtureBase
 {
     string _connectionString;
 
@@ -19,7 +20,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
         base.SetUp();
 
         // we have a database
-        _connectionString = ConnectionString;
+        _connectionString = MsSqlTestHelper.ConnectionString;
     }
 
     [Test]

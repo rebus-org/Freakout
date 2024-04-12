@@ -24,7 +24,7 @@ public static class FreakoutSqlConnectionExtensions
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         if (command == null) throw new ArgumentNullException(nameof(command));
 
-        var serializer = Globals.Get<ICommandSerializer>();
+        var serializer = Globals.Get<FreakoutConfiguration>().CommandSerializer;
         var serializedCommand = serializer.Serialize(command);
 
         var payload = serializedCommand.Payload;
@@ -44,7 +44,7 @@ public static class FreakoutSqlConnectionExtensions
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         if (command == null) throw new ArgumentNullException(nameof(command));
 
-        var serializer = Globals.Get<ICommandSerializer>();
+        var serializer = Globals.Get<FreakoutConfiguration>().CommandSerializer;
         var serializedCommand = serializer.Serialize(command);
 
         var payload = serializedCommand.Payload;
@@ -57,12 +57,14 @@ public static class FreakoutSqlConnectionExtensions
 
     static void Insert(DbTransaction transaction, string headers, byte[] bytes)
     {
+        var configuration = GetConfiguration();
+
         var connection = transaction.Connection ?? throw new ArgumentException($"The {transaction} did not have a DbConnection on it!");
 
         using var cmd = connection.CreateCommand();
 
         cmd.Transaction = transaction;
-        cmd.CommandText = "INSERT INTO [OutboxCommands] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
+        cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
         cmd.Parameters.Add(new SqlParameter("id", Guid.NewGuid()));
         cmd.Parameters.Add(new SqlParameter("headers", headers));
         cmd.Parameters.Add(new SqlParameter("payload", bytes));
@@ -72,16 +74,21 @@ public static class FreakoutSqlConnectionExtensions
 
     static async Task InsertAsync(DbTransaction transaction, string headers, byte[] bytes, CancellationToken cancellationToken)
     {
+        var configuration = GetConfiguration();
+
         var connection = transaction.Connection ?? throw new ArgumentException($"The {transaction} did not have a DbConnection on it!");
 
         using var cmd = connection.CreateCommand();
 
         cmd.Transaction = transaction;
-        cmd.CommandText = "INSERT INTO [OutboxCommands] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
+        cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
         cmd.Parameters.Add(new SqlParameter("id", Guid.NewGuid()));
         cmd.Parameters.Add(new SqlParameter("headers", headers));
         cmd.Parameters.Add(new SqlParameter("payload", bytes));
 
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
+
+    static MsSqlFreakoutConfiguration GetConfiguration() => Globals.Get<FreakoutConfiguration>() as MsSqlFreakoutConfiguration
+                                                            ?? throw new InvalidOperationException("Could not retrieve global, MSSQL-specific Freakout configuration");
 }

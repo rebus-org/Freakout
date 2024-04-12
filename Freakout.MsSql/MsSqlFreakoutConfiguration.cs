@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.MsSql;
 

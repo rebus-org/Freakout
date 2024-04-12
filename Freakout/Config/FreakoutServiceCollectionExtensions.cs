@@ -31,8 +31,8 @@ public static class FreakoutServiceCollectionExtensions
 
         services.AddSingleton(configuration.CommandSerializer);
 
-        // this is special and a monster hack: Stuff the command serializer in the background too!
-        Globals.Set(configuration.CommandSerializer);
+        // this is special and a monster hack: Stuff the configuration in the globals!
+        Globals.Set(configuration);
 
         services.AddSingleton<IOutboxCommandDispatcher, FreakoutOutboxCommandDispatcher>();
 

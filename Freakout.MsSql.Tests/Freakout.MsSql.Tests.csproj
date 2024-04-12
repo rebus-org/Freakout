@@ -22,4 +22,8 @@
 		<ProjectReference Include="..\Freakout.MsSql\Freakout.MsSql.csproj" />
 		<ProjectReference Include="..\Freakout.Tests\Freakout.Tests.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Contracts\" />
+	</ItemGroup>
 </Project>
