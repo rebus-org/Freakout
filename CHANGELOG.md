@@ -8,3 +8,6 @@
 
 ## 0.0.3
 * It's actually functional now!
+
+## 0.0.4
+* Add XML docs
