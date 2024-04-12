@@ -17,3 +17,6 @@
 
 ## 0.0.6
 * Pull dispatcher out, so it can be decorated (e.g. to implement Polly-based retries)
+
+## 0.0.7
+* Add `IOutbox` interface so outbox commands can be stored in a tech agnostic way
