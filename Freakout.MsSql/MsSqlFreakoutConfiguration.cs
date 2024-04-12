@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Data.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.MsSql;
 
@@ -33,5 +34,7 @@ public class MsSqlFreakoutConfiguration(string connectionString, bool automatica
 
             return msSqlOutbox;
         });
+
+        services.AddScoped<IOutbox>(p => new MsSqlOutbox(connectionString));
     }
 }

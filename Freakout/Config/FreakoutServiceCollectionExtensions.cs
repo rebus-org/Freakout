@@ -39,8 +39,14 @@ public static class FreakoutServiceCollectionExtensions
         // let the concrete configuration make its registrations
         configuration.ConfigureServices(services);
 
-        // must have IOutbox implementation now
+        // must have IOutboxCommandStore implementation now
         if (!services.Any(s => s.ServiceType == typeof(IOutboxCommandStore)))
+        {
+            throw new ApplicationException($"The configuration {configuration} did not make the necessary IOutboxCommandStore registration");
+        }
+
+        // must have IOutbox implementation now
+        if (!services.Any(s => s.ServiceType == typeof(IOutbox)))
         {
             throw new ApplicationException($"The configuration {configuration} did not make the necessary IOutbox registration");
         }

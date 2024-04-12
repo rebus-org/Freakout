@@ -17,17 +17,19 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
     public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
     {
+        // Collect disposables in this one 👇 Remember to consider disposal in all possible exit paths from this method!!
         var disposables = new CollectionDisposable();
+
         var connection = new SqlConnection(connectionString);
         disposables.Add(connection);
 
-        await connection.OpenAsync(cancellationToken);
-
-        var transaction = connection.BeginTransaction();
-        disposables.Add(transaction);
-
         try
         {
+            await connection.OpenAsync(cancellationToken);
+
+            var transaction = connection.BeginTransaction();
+            disposables.Add(transaction);
+
             using var command = connection.CreateCommand();
 
             command.CommandText = _selectQuery;
@@ -49,25 +51,21 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             if (!outboxCommands.Any())
             {
+                // EXIT - dispose
+                disposables.Dispose();
                 return OutboxCommandBatch.Empty;
             }
 
+            // EXIT - dispose deferred to dispose callback
             return new OutboxCommandBatch(
                 outboxCommands: outboxCommands,
-                completeAsync: async token =>
-                {
-                    try
-                    {
-                        await CompleteAsync(connection, transaction, outboxCommands, token);
-                    }
-                    finally
-                    {
-                        disposables.Dispose();
-                    }
-                });
+                completeAsync: token => CompleteAsync(connection, transaction, outboxCommands, token),
+                dispose: disposables.Dispose
+            );
         }
         catch (Exception exception)
         {
+            // EXIT - dispose
             disposables.Dispose();
             throw new ApplicationException("Could not get store tasks", exception);
         }

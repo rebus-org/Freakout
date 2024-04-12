@@ -70,6 +70,61 @@ public class SimpleSqlServerPoc : MsSqlFixtureBase
         Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));
     }
 
+    [Test]
+    public async Task CanAppendTextInBackground_UsingScopedOutboxAppender()
+    {
+        var texts = new ConcurrentQueue<string>();
+
+        var services = new ServiceCollection();
+
+        // normal stuff
+        services.AddLogging(l => l.AddConsole());
+        services.AddSingleton(texts);
+
+        // freakout stuff
+        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
+        services.AddCommandHandler<AppendTextOutboxCommandHandler>();
+
+        await using var provider = services.BuildServiceProvider();
+
+        provider.RunBackgroundWorkersAsync(_cancellationTokenSource.Token);
+
+        // pretend something happens somewhere else
+        Task.Run(async () =>
+        {
+            try
+            {
+                await AddOutboxCommandUsingScopedOutboxAppenderAsync(provider,
+                    new AppendTextOutboxCommand(Text: "Howdy!"));
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+        });
+
+        await texts.WaitOrDie(
+            timeoutSeconds: 3,
+            completionExpression: t => t.Count == 1,
+            failExpression: t => t.Count > 1,
+            failureDetailsFunction: () =>
+                $"Text was not appended as expected - expected one single 'Howdy!' to have been appended, but we got this: {string.Join(", ", texts)}"
+        );
+
+        Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));
+    }
+
+    async Task AddOutboxCommandUsingScopedOutboxAppenderAsync(ServiceProvider provider, object command)
+    {
+        using var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+        var outbox = scope.ServiceProvider.GetRequiredService<IOutbox>();
+
+        await outbox.AddOutboxCommandAsync(command);
+
+
+    }
+
     async Task AddOutboxCommandAsync(object command)
     {
         await using var connection = new SqlConnection(_connectionString);

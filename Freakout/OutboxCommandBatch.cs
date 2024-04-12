@@ -10,12 +10,12 @@ namespace Freakout;
 /// Represents a batch of store commands to be processed. When completed without errors, Freakout will call its completion method, which
 /// should cause the store to mark the contained commands as handled.
 /// </summary>
-public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync) : IEnumerable<OutboxCommand>
+public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync, Action dispose) : IEnumerable<OutboxCommand>, IDisposable
 {
     /// <summary>
     /// Gets an empty <see cref="OutboxCommandBatch"/>
     /// </summary>
-    public static readonly OutboxCommandBatch Empty = new(Array.Empty<OutboxCommand>(), _ => Task.CompletedTask);
+    public static readonly OutboxCommandBatch Empty = new(Array.Empty<OutboxCommand>(), _ => Task.CompletedTask, () => { });
 
     internal Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
@@ -25,4 +25,9 @@ public class OutboxCommandBatch(IEnumerable<OutboxCommand> outboxCommands, Func<
     public IEnumerator<OutboxCommand> GetEnumerator() => outboxCommands.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// Disposes and cleans up whatever resources need to be cleaned up
+    /// </summary>
+    public void Dispose() => dispose();
 }

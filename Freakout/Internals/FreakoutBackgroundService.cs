@@ -38,7 +38,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
 
                 try
                 {
-                    var batch = await store.GetPendingOutboxCommandsAsync(stoppingToken);
+                    using var batch = await store.GetPendingOutboxCommandsAsync(stoppingToken);
 
                     foreach (var command in batch)
                     {
