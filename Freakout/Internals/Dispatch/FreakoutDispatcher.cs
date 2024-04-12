@@ -12,7 +12,7 @@ class FreakoutDispatcher(ICommandSerializer commandSerializer, IServiceScopeFact
 {
     readonly ConcurrentDictionary<Type, Func<object, CancellationToken, Task>> _invokers = new();
 
-    public async Task ExecuteAsync(OutboxCommand outboxCommand, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(OutboxCommand outboxCommand, CancellationToken cancellationToken = default)
     {
         var command = commandSerializer.Deserialize(outboxCommand);
         var type = command.GetType();
@@ -26,9 +26,22 @@ class FreakoutDispatcher(ICommandSerializer commandSerializer, IServiceScopeFact
     {
         using var scope = serviceScopeFactory.CreateScope();
 
-        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<TCommand>>();
+        var handler = Resolve(scope.ServiceProvider);
 
         await handler.HandleAsync(command, cancellationToken);
+
+        static ICommandHandler<TCommand> Resolve(IServiceProvider serviceProvider)
+        {
+            try
+            {
+                return serviceProvider.GetRequiredService<ICommandHandler<TCommand>>();
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException(
+                    $"Could not resolve ICommandHandler<{typeof(TCommand)}> from the container", exception);
+            }
+        }
     }
 
     /// <summary>
@@ -43,20 +56,20 @@ class FreakoutDispatcher(ICommandSerializer commandSerializer, IServiceScopeFact
                          ?? throw new ArgumentException($"Could not get method '{methodName}'.");
 
         var genericMethod = methodInfo.MakeGenericMethod(commandType);
-       
+
         // get reference to this
         var instance = Expression.Constant(this);
 
         // get parameters
         var commandParameter = Expression.Parameter(typeof(object), "command");
         var cancellationTokenParameter = Expression.Parameter(typeof(CancellationToken), "cancellationToken");
-        
+
         // and convert the System.Object input to commandType
         var commandConversion = Expression.Convert(commandParameter, commandType);
-        
+
         // build the call
         var call = Expression.Call(instance, genericMethod, commandConversion, cancellationTokenParameter);
-        
+
         // and wrap it in a lambda with a signature we can use
         var lambda = Expression.Lambda<Func<object, CancellationToken, Task>>(call, commandParameter, cancellationTokenParameter);
 
