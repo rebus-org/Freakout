@@ -27,6 +27,18 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
-        throw new NotImplementedException();
+        services.AddSingleton<IOutboxCommandStore>(_ =>
+        {
+            var commandStore = new NpgSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
+
+            if (AutomaticallyCreateSchema)
+            {
+                commandStore.CreateSchema();
+            }
+
+            return commandStore;
+        });
+
+        services.AddScoped<IOutbox>(p => new NpgSqlOutbox(connectionString));
     }
 }

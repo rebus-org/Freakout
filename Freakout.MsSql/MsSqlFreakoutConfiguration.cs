@@ -33,14 +33,14 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
     {
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
-            var msSqlOutbox = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
+            var commandStore = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
 
             if (AutomaticallyCreateSchema)
             {
-                msSqlOutbox.CreateSchema();
+                commandStore.CreateSchema();
             }
 
-            return msSqlOutbox;
+            return commandStore;
         });
 
         services.AddScoped<IOutbox>(p => new MsSqlOutbox(connectionString));
