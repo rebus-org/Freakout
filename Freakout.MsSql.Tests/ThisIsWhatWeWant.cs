@@ -1,15 +1,13 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Freakout.Config;
-using Freakout.MsSql;
+﻿using Freakout.Config;
+using Freakout.Tests;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+
 // ReSharper disable ClassNeverInstantiated.Local
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-namespace Freakout.Tests;
+namespace Freakout.MsSql.Tests;
 
 [TestFixture]
 public class ThisIsWhatWeWant : MsSqlFixtureBase

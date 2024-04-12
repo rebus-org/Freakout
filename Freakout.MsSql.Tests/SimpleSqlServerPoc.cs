@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using Freakout.Config;
-using Freakout.MsSql;
+using Freakout.Tests;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +13,7 @@ using CancellationTokenSource = System.Threading.CancellationTokenSource;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-namespace Freakout.Tests;
+namespace Freakout.MsSql.Tests;
 
 [TestFixture]
 public class SimpleSqlServerPoc : MsSqlFixtureBase

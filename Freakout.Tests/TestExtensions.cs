@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Freakout.Tests;
 
-static class TestExtensions
+public static class TestExtensions
 {
     public static async Task RunBackgroundWorkersAsync(this ServiceProvider serviceProvider, CancellationToken stoppingToken)
     {

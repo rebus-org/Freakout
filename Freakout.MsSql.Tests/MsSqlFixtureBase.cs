@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Nito.AsyncEx.Synchronous;
 using Nito.Disposables;
 using NUnit.Framework;
 using Testcontainers.MsSql;
 using Testy;
 
-namespace Freakout.Tests;
+namespace Freakout.MsSql.Tests;
 
 [SetUpFixture]
 public abstract class MsSqlFixtureBase : FixtureBase
