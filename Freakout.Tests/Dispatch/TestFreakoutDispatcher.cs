@@ -47,8 +47,8 @@ public class TestFreakoutDispatcher : FixtureBase
         var services = new ServiceCollection();
 
         services.AddSingleton(events);
-        services.AddCommandHandler<AnotherCommand, AnotherCommandHandler>();
-        services.AddCommandHandler<ThirdCommand, ThirdCommandHandler>();
+        services.AddCommandHandler<AnotherCommandHandler>();
+        services.AddCommandHandler<ThirdCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
 
@@ -97,7 +97,7 @@ SCOPE 'Dispatch 10000000 commands' completed in 30029,7693 ms | 0,00300297693 ms
     {
         var services = new ServiceCollection();
 
-        services.AddCommandHandler<SomeCommand, SomeCommandHandler>();
+        services.AddCommandHandler<SomeCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
 

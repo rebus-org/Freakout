@@ -28,7 +28,7 @@ public class ThisIsWhatWeWant : MsSqlFixtureBase
         // and a modern .NET app
         var services = new ServiceCollection();
         services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString));
-        services.AddCommandHandler<PrintTextOutboxCommand, PrintTextOutboxCommandHandler>();
+        services.AddCommandHandler<PrintTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
 

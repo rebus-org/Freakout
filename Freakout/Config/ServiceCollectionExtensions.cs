@@ -41,14 +41,30 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the type <typeparamref name="TCommandHandler"/> as a Freakout command handler for commands of type <typeparamref name="TCommand"/>.
-    /// It is required that <typeparamref name="TCommandHandler"/> implements <see cref="ICommandHandler{TCommand}"/> closed with a compatible type.
+    /// Adds the type <typeparamref name="TCommandHandler"/> as a Freakout command handler.
+    /// It is required that <typeparamref name="TCommandHandler"/> implements one or more <see cref="ICommandHandler{TCommand}"/> closed with a compatible type.
     /// </summary>
-    public static void AddCommandHandler<TCommand, TCommandHandler>(this IServiceCollection services) where TCommandHandler : class, ICommandHandler<TCommand>
+    public static void AddCommandHandler<TCommandHandler>(this IServiceCollection services) where TCommandHandler : class, ICommandHandler
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
-        
-        services.AddScoped<ICommandHandler<TCommand>, TCommandHandler>();
-    }
 
+        var commandTypes = typeof(TCommandHandler)
+            .GetInterfaces()
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>))
+            .Select(i => i.GetGenericArguments().First())
+            .ToList();
+
+        if (!commandTypes.Any())
+        {
+            throw new ArgumentException(
+                $"The type {typeof(TCommandHandler)} cannot be registered as a command handler, because it doesn't implement ICommandHandler<TCommand>");
+        }
+
+        foreach (var commandType in commandTypes)
+        {
+            var serviceType = typeof(ICommandHandler<>).MakeGenericType(commandType);
+
+            services.AddScoped(serviceType, typeof(TCommandHandler));
+        }
+    }
 }
