@@ -38,3 +38,6 @@
 
 ## 0.0.13
 * Even better readme
+
+## 0.0.14
+* Move internals into internals folders

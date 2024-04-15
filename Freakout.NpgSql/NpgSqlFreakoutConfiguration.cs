@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Freakout.NpgSql.Internals;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.NpgSql;
 

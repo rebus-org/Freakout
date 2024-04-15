@@ -1,4 +1,4 @@
-﻿using Freakout.Internals;
+﻿using Freakout.MsSql.Internals;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.MsSql;

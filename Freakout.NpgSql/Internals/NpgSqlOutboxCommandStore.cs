@@ -7,7 +7,7 @@ using Freakout.Serialization;
 using Nito.Disposables;
 using Npgsql;
 
-namespace Freakout.NpgSql;
+namespace Freakout.NpgSql.Internals;
 
 class NpgSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int commandProcessingBatchSize) : IOutboxCommandStore
 {

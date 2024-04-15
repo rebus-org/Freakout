@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Freakout.NpgSql;
+namespace Freakout.MsSql.Internals;
 
 static class InternalExtensions
 {

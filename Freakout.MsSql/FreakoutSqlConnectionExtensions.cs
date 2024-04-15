@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Internals;
+using Freakout.MsSql.Internals;
 using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 // ReSharper disable UseAwaitUsing

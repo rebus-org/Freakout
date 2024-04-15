@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 using Nito.Disposables;
+
 // ReSharper disable AccessToDisposedClosure
 // ReSharper disable UseAwaitUsing
 
-namespace Freakout.MsSql;
+namespace Freakout.MsSql.Internals;
 
 class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutboxCommandStore
 {

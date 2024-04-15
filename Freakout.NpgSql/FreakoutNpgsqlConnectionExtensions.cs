@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Internals;
+using Freakout.NpgSql.Internals;
 using Freakout.Serialization;
 using Npgsql;
 using NpgsqlTypes;
