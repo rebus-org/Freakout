@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using Freakout.Internals;
 using Freakout.Serialization;
 using Npgsql;
