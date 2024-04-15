@@ -44,3 +44,6 @@
 
 ## 0.0.15
 * Lose the dependency on Microsoft.CSharp when it isn't necessary
+
+## 0.0.16
+* Update readme

@@ -30,7 +30,7 @@ Then, add your handlers:
 ```csharp
 services.AddCommandHandler<RecalculateClaimSummaryCommandHandler>();
 services.AddCommandHandler<SendEmailCommandHandler>();
-services.AddCommandHandler<PublishRebusEventCommandHandler>();
+services.AddCommandHandler<PublishJournalEntryAddedCommandHandler>();
 ```
 
 which will of course be resolved from the container, each in their own service scope.
@@ -114,7 +114,7 @@ container using the `AddCommandHandler` extension method shown above.
 A command handler to publish the aforementioned Rebus event could look like this (assuming [Rebus](https://github.com/rebus-org/Rebus) has also been configured in the given container):
 
 ```csharp
-public class PublishRebusEventCommandHandler(IBus bus) : ICommandHandler<PublishJournalEntryAddedCommand>
+public class PublishJournalEntryAddedCommandHandler(IBus bus) : ICommandHandler<PublishJournalEntryAddedCommand>
 {
 	public async Task HandleAsync(PublishJournalEntryAddedCommand command, CancellationToken token)
 	{
