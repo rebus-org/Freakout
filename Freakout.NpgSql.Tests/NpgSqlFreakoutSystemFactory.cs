@@ -19,6 +19,7 @@ public class NpgSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
         var configuration = new NpgSqlFreakoutConfiguration(NpgSqlTestHelper.ConnectionString)
         {
             OutboxPollInterval = TimeSpan.FromSeconds(1),
+            TableName = tableName
         };
 
         services.AddFreakout(configuration);

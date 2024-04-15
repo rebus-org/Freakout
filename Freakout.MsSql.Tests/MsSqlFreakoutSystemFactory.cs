@@ -16,7 +16,8 @@ public class MsSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
 
         var configuration = new MsSqlFreakoutConfiguration(MsSqlTestHelper.ConnectionString)
         {
-            TableName = tableName
+            TableName = tableName,
+            OutboxPollInterval = TimeSpan.FromSeconds(1)
         };
 
         services.AddFreakout(configuration);

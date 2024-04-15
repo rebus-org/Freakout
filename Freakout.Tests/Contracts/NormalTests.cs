@@ -1,8 +1,17 @@
-﻿using System.Linq;
+﻿using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Freakout.Config;
 using Freakout.Internals;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Testy;
+using Testy.Extensions;
+using Testy.General;
+// ReSharper disable ClassNeverInstantiated.Local
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Freakout.Tests.Contracts;
 
@@ -18,7 +27,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     }
 
     [Test]
-    public void CanStartUpAndShutDown() => _ = _factory.CreateAsync();
+    public void CanStartUpAndShutDown() => _ = _factory.Create();
 
     [Test]
     [Description("To provide the best experience, Freakout registers a couple of global objects. We want to be pretty sure that they're there when the system runs, and that they're gone when it's stopped again.")]
@@ -26,7 +35,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     {
         var globalsBefore = Globals.GetAll();
 
-        _ = _factory.CreateAsync();
+        _ = _factory.Create();
 
         var detectedPresenceOfConfiguration = Globals.Get<FreakoutConfiguration>() != null;
 
@@ -42,7 +51,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveSingleCommand()
     {
-        var system = _factory.CreateAsync();
+        var system = _factory.Create();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
@@ -64,7 +73,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommands()
     {
-        var system = _factory.CreateAsync();
+        var system = _factory.Create();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
@@ -92,7 +101,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommandsParallel()
     {
-        var system = _factory.CreateAsync();
+        var system = _factory.Create();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
@@ -117,4 +126,53 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     }
 
     record SomeKindOfCommand;
+
+    [Test]
+    public async Task HandlersAreExecutedInScope()
+    {
+        var events = new ConcurrentQueue<string>();
+
+        var services = new ServiceCollection();
+
+        services.AddCommandHandler<SomeKindOfCommandHandler>();
+        services.AddSingleton(events);
+
+        var system = _factory.Create(services);
+
+        var cts = Using(new CancellationTokenSource());
+        Using(new DisposableCallback(cts.Cancel));
+
+        _ = system.StartCommandProcessorAsync(cts.Token);
+
+        var expectedNameOfContext = "";
+
+        _ = Task.Run(async () =>
+        {
+            using var scope = system.CreateScope();
+
+            expectedNameOfContext = new AsyncLocalFreakoutContextAccessor().GetContext<IFreakoutContext>()?.GetType().Name;
+
+            var outbox = system.Outbox;
+
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand(), cancellationToken: CancellationToken.None);
+
+            scope.Complete();
+        }, CancellationToken.None);
+
+        await events.WaitOrDie(q => q.Count == 1, failExpression: q => q.Count > 1, timeoutSeconds: 5);
+
+        var text = events.First();
+
+        Assert.That(text, Is.EqualTo($"Got this context: {expectedNameOfContext}"));
+    }
+
+    class SomeKindOfCommandHandler(IFreakoutContextAccessor contextAccessor, ConcurrentQueue<string> events) : ICommandHandler<SomeKindOfCommand>
+    {
+        public async Task HandleAsync(SomeKindOfCommand command, CancellationToken cancellationToken)
+        {
+            var context = contextAccessor.GetContext<IFreakoutContext>(throwIfNull: false);
+
+            events.Enqueue($"Got this context: {context?.GetType().Name}");
+        }
+    }
 }

@@ -56,6 +56,7 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
             // EXIT - dispose deferred to dispose callback
             return new OutboxCommandBatch(
+                freakoutContext: new NpgsqlFreakoutContext(connection, transaction),
                 outboxCommands: outboxCommands,
                 completeAsync: token => CompleteAsync(connection, transaction, outboxCommands, token),
                 dispose: disposables.Dispose
@@ -91,7 +92,7 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
         command.CommandText = $@"
 
-CREATE TABLE IF NOT EXISTS {schemaName}.{tableName} (
+CREATE TABLE IF NOT EXISTS ""{schemaName}"".""{tableName}"" (
     ""id"" UUID PRIMARY KEY,
     ""time"" TIMESTAMPTZ NOT NULL,
     ""headers"" JSONB,

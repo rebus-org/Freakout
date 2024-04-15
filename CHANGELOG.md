@@ -29,3 +29,6 @@
 
 ## 0.0.10
 * New artwork
+
+## 0.0.11
+* Execute command handlers in Freakout context too

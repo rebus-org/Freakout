@@ -58,6 +58,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             // EXIT - dispose deferred to dispose callback
             return new OutboxCommandBatch(
+                freakoutContext: new MsSqlFreakoutContext(connection, transaction),
                 outboxCommands: outboxCommands,
                 completeAsync: token => CompleteAsync(connection, transaction, outboxCommands, token),
                 dispose: disposables.Dispose

@@ -7,7 +7,7 @@ public abstract class AbstractFreakoutSystemFactory : IFreakoutSystemFactory
 {
     protected readonly CollectionDisposable disposables = new();
 
-    public FreakoutSystem CreateAsync(IServiceCollection services = null)
+    public FreakoutSystem Create(IServiceCollection services = null)
     {
         services ??= new ServiceCollection();
 
