@@ -50,3 +50,6 @@
 
 ## 0.0.17
 * Update readme
+
+## 0.0.18
+* Generate sequential GUIDs

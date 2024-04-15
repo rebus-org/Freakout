@@ -8,6 +8,7 @@ using Freakout.NpgSql.Internals;
 using Freakout.Serialization;
 using Npgsql;
 using NpgsqlTypes;
+using SequentialGuid;
 // ReSharper disable UseAwaitUsing
 
 namespace Freakout.NpgSql;
@@ -91,7 +92,7 @@ public static class FreakoutNpgsqlConnectionExtensions
     {
         cmd.CommandText = $@"INSERT INTO ""{configuration.SchemaName}"".""{configuration.TableName}"" (""id"", ""time"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
 
-        cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = Guid.NewGuid() });
+        cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = SequentialGuidGenerator.Instance.NewGuid() });
         cmd.Parameters.Add(new NpgsqlParameter("headers", NpgsqlDbType.Jsonb) { Value = headers });
         cmd.Parameters.Add(new NpgsqlParameter("payload", NpgsqlDbType.Bytea) { Value = bytes });
     }

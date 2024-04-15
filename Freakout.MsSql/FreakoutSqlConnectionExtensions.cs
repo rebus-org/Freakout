@@ -7,6 +7,8 @@ using Freakout.Internals;
 using Freakout.MsSql.Internals;
 using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
+using SequentialGuid;
+
 // ReSharper disable UseAwaitUsing
 
 namespace Freakout.MsSql;
@@ -89,7 +91,7 @@ public static class FreakoutSqlConnectionExtensions
     static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, MsSqlFreakoutConfiguration configuration)
     {
         cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
-        cmd.Parameters.Add(new SqlParameter("id", Guid.NewGuid()));
+        cmd.Parameters.Add(new SqlParameter("id", SequentialGuidGenerator.Instance.NewGuid()));
         cmd.Parameters.Add(new SqlParameter("headers", headers));
         cmd.Parameters.Add(new SqlParameter("payload", bytes));
     }
