@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Data.Common;
 using Freakout.Internals;
 using Freakout.Serialization;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+using NpgsqlTypes;
 // ReSharper disable UseAwaitUsing
 
-namespace Freakout.MsSql;
+namespace Freakout.NpgSql;
 
 /// <summary>
 /// Relevant extension methods for working with store commands in Microsoft SQL Server
 /// </summary>
-public static class FreakoutSqlConnectionExtensions
+public static class FreakoutNpgsqlConnectionExtensions
 {
     /// <summary>
     /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
@@ -85,14 +82,15 @@ public static class FreakoutSqlConnectionExtensions
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, MsSqlFreakoutConfiguration configuration)
+    static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, NpgSqlFreakoutConfiguration configuration)
     {
-        cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
-        cmd.Parameters.Add(new SqlParameter("id", Guid.NewGuid()));
-        cmd.Parameters.Add(new SqlParameter("headers", headers));
-        cmd.Parameters.Add(new SqlParameter("payload", bytes));
+        cmd.CommandText = $@"INSERT INTO {configuration.SchemaName}.{configuration.TableName} (""id"", ""time"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
+
+        cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = Guid.NewGuid() });
+        cmd.Parameters.Add(new NpgsqlParameter("headers", NpgsqlDbType.Jsonb) { Value = headers });
+        cmd.Parameters.Add(new NpgsqlParameter("payload", NpgsqlDbType.Bytea) { Value = bytes });
     }
 
-    static MsSqlFreakoutConfiguration GetConfiguration() => Globals.Get<FreakoutConfiguration>() as MsSqlFreakoutConfiguration
-                                                            ?? throw new InvalidOperationException("Could not retrieve global, MSSQL-specific Freakout configuration");
+    static NpgSqlFreakoutConfiguration GetConfiguration() => Globals.Get<FreakoutConfiguration>() as NpgSqlFreakoutConfiguration
+                                                             ?? throw new InvalidOperationException("Could not retrieve global, PostgreSQL-specific Freakout configuration");
 }

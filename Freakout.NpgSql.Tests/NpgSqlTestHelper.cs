@@ -39,12 +39,7 @@ class NpgSqlTestHelper
         connection.Open();
 
         using var command = connection.CreateCommand();
-        command.CommandText = $@"
-IF EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}') 
-BEGIN
-    DROP TABLE [{schemaName}].[{tableName}]
-END
-";
+        command.CommandText = $@"DROP TABLE IF EXISTS ""{schemaName}"".""{tableName}"";";
         command.ExecuteNonQuery();
     }
 

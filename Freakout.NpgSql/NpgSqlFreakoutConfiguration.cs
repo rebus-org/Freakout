@@ -12,7 +12,7 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
     /// <summary>
     /// Configures the store table name. Defaults to "OutboxCommands".
     /// </summary>
-    public string TableName { get; set; } = "OutboxCommands";
+    public string TableName { get; set; } = "outbox_commands";
 
     /// <summary>
     /// Configures whether the schema should be created automatically

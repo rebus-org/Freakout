@@ -34,8 +34,5 @@ public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
         return new(provider);
     }
 
-    public void Dispose()
-    {
-
-    }
+    public void Dispose() => disposables.Dispose();
 }

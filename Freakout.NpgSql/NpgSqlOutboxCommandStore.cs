@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Freakout.Serialization;
-using Microsoft.Data.SqlClient;
+﻿using Freakout.Serialization;
 using Nito.Disposables;
-// ReSharper disable AccessToDisposedClosure
-// ReSharper disable UseAwaitUsing
+using Npgsql;
 
-namespace Freakout.MsSql;
+namespace Freakout.NpgSql;
 
-class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutboxCommandStore
+public class NpgSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int commandProcessingBatchSize) : IOutboxCommandStore
 {
-    readonly string _selectQuery = $"SELECT TOP {processingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK, READPAST) WHERE [Completed] = 0 ORDER BY [Id]";
+    readonly string _selectQuery = $@"SELECT * FROM ""{schemaName}"".""{tableName}"" WHERE ""completed"" = FALSE ORDER BY ""id"" FOR UPDATE SKIP LOCKED LIMIT {commandProcessingBatchSize};";
 
     public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
     {
         // Collect disposables in this one 👇 Remember to consider disposal in all possible exit paths from this method!!
         var disposables = new CollectionDisposable();
 
-        var connection = new SqlConnection(connectionString);
+        var connection = new NpgsqlConnection(connectionString);
         disposables.Add(connection);
 
         try
@@ -37,16 +30,16 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-            var outboxCommands = new List<MsSqlOutboxCommand>();
+            var outboxCommands = new List<NpgsqlOutboxCommand>();
 
             while (await reader.ReadAsync(cancellationToken))
             {
-                var id = (Guid)reader["Id"];
-                var time = (DateTimeOffset)reader["Time"];
-                var headers = HeaderSerializer.DeserializeFromString((string)reader["Headers"]);
-                var payload = (byte[])reader["Payload"];
+                var id = (Guid)reader["id"];
+                var time = new DateTimeOffset((DateTime)reader["time"]);
+                var headers = HeaderSerializer.DeserializeFromString((string)reader["headers"]);
+                var payload = (byte[])reader["payload"];
 
-                outboxCommands.Add(new MsSqlOutboxCommand(id, time, headers, payload));
+                outboxCommands.Add(new NpgsqlOutboxCommand(id, time, headers, payload));
             }
 
             if (!outboxCommands.Any())
@@ -71,12 +64,12 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
         }
     }
 
-    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<MsSqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
+    async Task CompleteAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, List<NpgsqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1 WHERE [Id] IN ({ids})";
+        command.CommandText = $@"UPDATE ""{schemaName}"".""{tableName}"" SET ""completed"" = TRUE WHERE ""id"" IN ({ids});";
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 
@@ -85,7 +78,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
     public void CreateSchema()
     {
-        using var connection = new SqlConnection(connectionString);
+        using var connection = new NpgsqlConnection(connectionString);
 
         connection.Open();
 
@@ -93,21 +86,17 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
         command.CommandText = $@"
 
-IF NOT EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}') 
-BEGIN
-    CREATE TABLE [{schemaName}].[{tableName}] (
-        [Id] UNIQUEIDENTIFIER,
-        [Time] DATETIMEOFFSET(3) NOT NULL,
-        [Headers] NVARCHAR(MAX),
-        [Payload] VARBINARY(MAX),
-        [Completed] BIT NOT NULL DEFAULT(0),
-
-        PRIMARY KEY ([Id])
-    )
-END
+CREATE TABLE IF NOT EXISTS {schemaName}.{tableName} (
+    ""id"" UUID PRIMARY KEY,
+    ""time"" TIMESTAMPTZ NOT NULL,
+    ""headers"" JSONB,
+    ""payload"" BYTEA,
+    ""completed"" BOOLEAN NOT NULL DEFAULT FALSE
+);
 
 ";
 
         command.ExecuteNonQuery();
+
     }
 }
