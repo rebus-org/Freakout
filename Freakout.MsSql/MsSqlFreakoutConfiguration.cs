@@ -32,8 +32,6 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<IFreakoutContextAccessor, AsyncLocalFreakoutContextAccessor>();
-        
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
             var commandStore = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);

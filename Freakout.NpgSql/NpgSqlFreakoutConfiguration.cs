@@ -43,6 +43,6 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
             return commandStore;
         });
 
-        services.AddScoped<IOutbox>(_ => new NpgSqlOutbox(connectionString));
+        services.AddScoped<IOutbox, NpgSqlOutbox>();
     }
 }

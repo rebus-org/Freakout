@@ -3,6 +3,8 @@ using System.Linq;
 using Freakout.Internals;
 using Freakout.Internals.Dispatch;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 // ReSharper disable SimplifyLinqExpressionUseAll
 
 namespace Freakout.Config;
@@ -60,6 +62,8 @@ public static class FreakoutServiceCollectionExtensions
         {
             throw new ApplicationException($"The configuration {configuration} did not make the necessary IOutbox registration");
         }
+
+        services.TryAddSingleton<IFreakoutContextAccessor, AsyncLocalFreakoutContextAccessor>();
 
         // this is special and a monster hack: Stuff the configuration in the globals!
         Globals.Set(configuration);

@@ -23,3 +23,6 @@
 
 ## 0.0.8
 * NpgSQL outbox!
+
+## 0.0.9
+* Change the way connections are provided by introducing ambient contexts
