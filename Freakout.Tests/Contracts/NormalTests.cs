@@ -1,15 +1,20 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
 using Freakout.Internals;
 using Microsoft.Extensions.DependencyInjection;
+using Nito.AsyncEx;
 using NUnit.Framework;
 using Testy;
 using Testy.Extensions;
 using Testy.General;
 // ReSharper disable ClassNeverInstantiated.Local
+// ReSharper disable ConvertToUsingDeclaration
+// ReSharper disable MethodSupportsCancellation
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -175,4 +180,61 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
             events.Enqueue($"Got this context: {context?.GetType().Name}");
         }
     }
+
+    [Test]
+    public void CommandHandlerCanUseOutboxToo()
+    {
+        var done = new AsyncManualResetEvent();
+        var events = new ConcurrentQueue<string>();
+        var services = new ServiceCollection();
+
+        services.AddSingleton(done);
+        services.AddSingleton(events);
+        services.AddCommandHandler<CommandHandler>();
+
+        var system = _factory.Create(services);
+
+        var cts = Using(new CancellationTokenSource());
+        Using(new DisposableCallback(cts.Cancel));
+
+        _ = system.StartCommandProcessorAsync(cts.Token);
+
+        using (var scope = system.CreateScope())
+        {
+            var outbox = system.Outbox;
+            outbox.AddOutboxCommand(new InitiatingCommand());
+            scope.Complete();
+        }
+
+        done.Wait(CancelAfter(TimeSpan.FromSeconds(5)));
+
+        Assert.That(events, Is.EqualTo(new[]
+        {
+            "Got InitiatingCommand",
+            "Sent FinishingCommand",
+            "Got FinishingCommand",
+            "Signaling done!"
+        }));
+    }
+
+    record InitiatingCommand;
+
+    class CommandHandler(IOutbox outbox, ConcurrentQueue<string> events, AsyncManualResetEvent done) : ICommandHandler<InitiatingCommand>, ICommandHandler<FinishingCommand>
+    {
+        public async Task HandleAsync(InitiatingCommand command, CancellationToken cancellationToken)
+        {
+            events.Enqueue("Got InitiatingCommand");
+            await outbox.AddOutboxCommandAsync(new FinishingCommand(), cancellationToken: cancellationToken);
+            events.Enqueue("Sent FinishingCommand");
+        }
+
+        public async Task HandleAsync(FinishingCommand command, CancellationToken cancellationToken)
+        {
+            events.Enqueue("Got FinishingCommand");
+            events.Enqueue("Signaling done!");
+            done.Set();
+        }
+    }
+
+    record FinishingCommand;
 }
