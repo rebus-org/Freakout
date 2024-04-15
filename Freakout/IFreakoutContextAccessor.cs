@@ -8,8 +8,10 @@ namespace Freakout;
 public interface IFreakoutContextAccessor
 {
     /// <summary>
-    /// Returns the current ambient Freakout context of type <typeparamref name="TContext"/> or NULL, if there is none.
+    /// Returns the current ambient Freakout context of type <typeparamref name="TContext"/>.
+    /// If <paramref name="throwIfNull"/> is TRUE, an <see cref="InvalidOperationException"/> is thrown if no context could be found.
+    /// If <paramref name="throwIfNull"/> is FALSE and there's no context, NULL is returned.
     /// Throws <see cref="InvalidCastException"/> if there is a context but it is not of type <typeparamref name="TContext"/>.
     /// </summary>
-    TContext GetContext<TContext>() where TContext : class, IFreakoutContext;
+    TContext GetContext<TContext>(bool throwIfNull = true) where TContext : class, IFreakoutContext;
 }

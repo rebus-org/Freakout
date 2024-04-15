@@ -117,11 +117,24 @@ public class SimpleSqlServerPoc : FixtureBase
 
     static async Task AddOutboxCommandUsingScopedOutboxAppenderAsync(ServiceProvider provider, object command)
     {
-        using var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        // create connection/transaction
+        await using var connection = new SqlConnection(MsSqlTestHelper.ConnectionString);
+        await connection.OpenAsync();
+        await using var transaction = connection.BeginTransaction();
 
-        var outbox = scope.ServiceProvider.GetRequiredService<IOutbox>();
+        // pass them via ambient context
+        var msSqlFreakoutContext = new MsSqlFreakoutContext(connection, transaction);
 
-        await outbox.AddOutboxCommandAsync(command);
+        using (new FreakoutContextScope(msSqlFreakoutContext))
+        {
+            using var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+            var outbox = scope.ServiceProvider.GetRequiredService<IOutbox>();
+
+            await outbox.AddOutboxCommandAsync(command);
+        }
+
+        await transaction.CommitAsync();
     }
 
     async Task AddOutboxCommandAsync(object command)

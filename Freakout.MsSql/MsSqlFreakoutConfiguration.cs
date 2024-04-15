@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Freakout.Internals;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.MsSql;
 
@@ -31,6 +32,8 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IFreakoutContextAccessor, AsyncLocalFreakoutContextAccessor>();
+        
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
             var commandStore = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
@@ -43,6 +46,6 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
             return commandStore;
         });
 
-        services.AddScoped<IOutbox>(p => new MsSqlOutbox(connectionString));
+        services.AddScoped<IOutbox, MsSqlOutbox>();
     }
 }

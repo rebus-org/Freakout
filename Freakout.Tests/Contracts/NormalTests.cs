@@ -46,7 +46,11 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
-        await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+        using (var scope = system.CreateScope())
+        {
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+            scope.Complete();
+        }
 
         using var batch = await commandStore.GetPendingOutboxCommandsAsync();
 
@@ -64,8 +68,12 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
-        await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
-        await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+        using (var scope = system.CreateScope())
+        {
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+            scope.Complete();
+        }
 
         using var batch1 = await commandStore.GetPendingOutboxCommandsAsync();
         await batch1.CompleteAsync();
@@ -88,8 +96,12 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
-        await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
-        await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+        using (var scope = system.CreateScope())
+        {
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+            await outbox.AddOutboxCommandAsync(new SomeKindOfCommand());
+            scope.Complete();
+        }
 
         using var batch1 = await commandStore.GetPendingOutboxCommandsAsync();
         using var batch2 = await commandStore.GetPendingOutboxCommandsAsync();
