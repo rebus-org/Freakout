@@ -10,12 +10,12 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<PackageIcon>freakout.png</PackageIcon>
+		<PackageIcon>transparent_2024-04-11T18-52-17_cropped.png</PackageIcon>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\artwork\freakout.png">
+		<None Include="..\artwork\transparent_2024-04-11T18-52-17_cropped.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

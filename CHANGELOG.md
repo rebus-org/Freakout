@@ -26,3 +26,6 @@
 
 ## 0.0.9
 * Change the way connections are provided by introducing ambient contexts
+
+## 0.0.10
+* New artwork
