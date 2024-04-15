@@ -47,3 +47,6 @@
 
 ## 0.0.16
 * Update readme
+
+## 0.0.17
+* Update readme

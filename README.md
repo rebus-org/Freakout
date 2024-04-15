@@ -105,6 +105,14 @@ app.Use(async (context, next) => {
 
 ```
 
+Having `IOutbox` injected is pretty neat, because it allows you to put commands in the outbox simply by going:
+
+```csharp
+await outbox.AddOutboxCommandAsync(command);
+```
+
+without having to bother with thinking about which type of persistence is being used.
+
 
 ## What does a command handler look like?
 
