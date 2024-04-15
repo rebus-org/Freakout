@@ -18,15 +18,15 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     }
 
     [Test]
-    public async Task CanStartUpAndShutDown() => _ = await _factory.CreateAsync();
+    public void CanStartUpAndShutDown() => _ = _factory.CreateAsync();
 
     [Test]
     [Description("To provide the best experience, Freakout registers a couple of global objects. We want to be pretty sure that they're there when the system runs, and that they're gone when it's stopped again.")]
-    public async Task CanStartUpAndShutDown_CheckGlobals()
+    public void CanStartUpAndShutDown_CheckGlobals()
     {
         var globalsBefore = Globals.GetAll();
 
-        _ = await _factory.CreateAsync();
+        _ = _factory.CreateAsync();
 
         var detectedPresenceOfConfiguration = Globals.Get<FreakoutConfiguration>() != null;
 
@@ -42,7 +42,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveSingleCommand()
     {
-        var system = await _factory.CreateAsync();
+        var system = _factory.CreateAsync();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
@@ -64,7 +64,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommands()
     {
-        var system = await _factory.CreateAsync();
+        var system = _factory.CreateAsync();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 
@@ -92,7 +92,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     [Test]
     public async Task CanSendAndReceiveMultipleCommandsParallel()
     {
-        var system = await _factory.CreateAsync();
+        var system = _factory.CreateAsync();
         var commandStore = system.OutboxCommandStore;
         var outbox = system.Outbox;
 

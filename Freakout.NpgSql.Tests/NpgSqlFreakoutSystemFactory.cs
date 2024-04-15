@@ -1,7 +1,6 @@
 ﻿using Freakout.Config;
 using Freakout.Tests.Contracts;
 using Microsoft.Extensions.DependencyInjection;
-using Nito.Disposables;
 using Npgsql;
 using Testy.General;
 
@@ -9,14 +8,10 @@ using Testy.General;
 
 namespace Freakout.NpgSql.Tests;
 
-public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
+public class NpgSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
 {
-    readonly CollectionDisposable disposables = new();
-
-    public async Task<FreakoutSystem> CreateAsync()
+    protected override void ConfigureServices(IServiceCollection services)
     {
-        var services = new ServiceCollection();
-
         var tableName = $"outbox-{Guid.NewGuid():N}";
 
         disposables.Add(new DisposableCallback(() => NpgSqlTestHelper.DropTable(tableName)));
@@ -27,11 +22,10 @@ public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
         };
 
         services.AddFreakout(configuration);
+    }
 
-        var provider = services.BuildServiceProvider();
-
-        disposables.Add(provider);
-
+    protected override FreakoutSystem GetFreakoutSystem(ServiceProvider provider)
+    {
         IFreakoutContext ContextFactory()
         {
             var connection = new NpgsqlConnection(NpgSqlTestHelper.ConnectionString);
@@ -55,6 +49,4 @@ public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
 
         return new(provider, ContextFactory, CommitAction, DisposeAction);
     }
-
-    public void Dispose() => disposables.Dispose();
 }

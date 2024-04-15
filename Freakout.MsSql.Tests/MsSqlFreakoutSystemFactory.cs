@@ -2,24 +2,17 @@
 using Freakout.Tests.Contracts;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
-using Nito.Disposables;
 using Testy.General;
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Freakout.MsSql.Tests;
 
-public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
+public class MsSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
 {
-    readonly CollectionDisposable disposables = new();
-
-    public async Task<FreakoutSystem> CreateAsync()
+    protected override void ConfigureServices(IServiceCollection services)
     {
         var tableName = $"outbox-{Guid.NewGuid():N}";
 
         disposables.Add(new DisposableCallback(() => MsSqlTestHelper.DropTable(tableName)));
-
-        var services = new ServiceCollection();
 
         var configuration = new MsSqlFreakoutConfiguration(MsSqlTestHelper.ConnectionString)
         {
@@ -27,11 +20,10 @@ public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
         };
 
         services.AddFreakout(configuration);
+    }
 
-        var provider = services.BuildServiceProvider();
-
-        disposables.Add(provider);
-
+    protected override FreakoutSystem GetFreakoutSystem(ServiceProvider provider)
+    {
         IFreakoutContext ContextFactory()
         {
             var connection = new SqlConnection(MsSqlTestHelper.ConnectionString);
@@ -55,6 +47,4 @@ public class MsSqlFreakoutSystemFactory : IFreakoutSystemFactory
 
         return new(provider, ContextFactory, CommitAction, DisposeAction);
     }
-
-    public void Dispose() => disposables.Dispose();
 }
