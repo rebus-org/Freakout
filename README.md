@@ -7,7 +7,8 @@ Why? Because "outbox" is closer to your chosen type of persistence (SQL Server, 
 
 ## Which types of persistence does it support?
 
-1. Microsoft SQL Server (for when you're working with `Microsoft.Data.SqlClient` and `SqlConnection`)
+1. Microsoft SQL Server (for when you're working with the "Microsoft.Data.SqlClient" NuGet package and `SqlConnection`/`SqlTransaction`)
+1. PostgreSQL (for when you're working with "Npgsql" NuGet package and `NpgsqlConnection`/`NpgsqlTransaction`)
 
 and that's it for now. 😅
 

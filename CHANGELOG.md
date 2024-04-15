@@ -32,3 +32,6 @@
 
 ## 0.0.11
 * Execute command handlers in Freakout context too
+
+## 0.0.12
+* Update readme
