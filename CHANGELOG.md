@@ -35,3 +35,6 @@
 
 ## 0.0.12
 * Update readme
+
+## 0.0.13
+* Even better readme
