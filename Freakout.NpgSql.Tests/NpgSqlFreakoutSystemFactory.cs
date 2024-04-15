@@ -2,6 +2,7 @@
 using Freakout.Tests.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Nito.Disposables;
+using Npgsql;
 using Testy.General;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -31,7 +32,28 @@ public class NpgSqlFreakoutSystemFactory : IFreakoutSystemFactory
 
         disposables.Add(provider);
 
-        return new(provider, null, null, null);
+        IFreakoutContext ContextFactory()
+        {
+            var connection = new NpgsqlConnection(NpgSqlTestHelper.ConnectionString);
+            connection.Open();
+            var transaction = connection.BeginTransaction();
+            return new NpgsqlFreakoutContext(connection, transaction);
+        }
+
+        void CommitAction(IFreakoutContext context)
+        {
+            var ctx = (NpgsqlFreakoutContext)context;
+            ctx.Transaction.Commit();
+        }
+
+        void DisposeAction(IFreakoutContext context)
+        {
+            var ctx = (NpgsqlFreakoutContext)context;
+            ctx.Transaction.Dispose();
+            ctx.Connection.Dispose();
+        }
+
+        return new(provider, ContextFactory, CommitAction, DisposeAction);
     }
 
     public void Dispose() => disposables.Dispose();
