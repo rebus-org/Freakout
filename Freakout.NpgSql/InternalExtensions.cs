@@ -1,4 +1,7 @@
-﻿namespace Freakout.NpgSql;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Freakout.NpgSql;
 
 static class InternalExtensions
 {

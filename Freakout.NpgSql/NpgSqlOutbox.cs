@@ -1,8 +1,12 @@
-﻿using Npgsql;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Npgsql;
 
 namespace Freakout.NpgSql;
 
-public class NpgSqlOutbox(string connectionString) : IOutbox
+class NpgSqlOutbox(string connectionString) : IOutbox
 {
     public void AddOutboxCommand(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
@@ -17,10 +21,10 @@ public class NpgSqlOutbox(string connectionString) : IOutbox
     public async Task AddOutboxCommandAsync(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
         if (command == null) throw new ArgumentNullException(nameof(command));
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
-        using var transaction = connection.BeginTransaction();
+        await using var transaction = connection.BeginTransaction();
         await transaction.AddOutboxCommandAsync(command, headers, cancellationToken);
-        transaction.Commit();
+        await transaction.CommitAsync(cancellationToken);
     }
 }

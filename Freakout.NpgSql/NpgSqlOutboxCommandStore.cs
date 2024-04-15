@@ -1,10 +1,15 @@
-﻿using Freakout.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Freakout.Serialization;
 using Nito.Disposables;
 using Npgsql;
 
 namespace Freakout.NpgSql;
 
-public class NpgSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int commandProcessingBatchSize) : IOutboxCommandStore
+class NpgSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int commandProcessingBatchSize) : IOutboxCommandStore
 {
     readonly string _selectQuery = $@"SELECT * FROM ""{schemaName}"".""{tableName}"" WHERE ""completed"" = FALSE ORDER BY ""id"" FOR UPDATE SKIP LOCKED LIMIT {commandProcessingBatchSize};";
 
@@ -28,7 +33,7 @@ public class NpgSqlOutboxCommandStore(string connectionString, string tableName,
             command.CommandText = _selectQuery;
             command.Transaction = transaction;
 
-            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             var outboxCommands = new List<NpgsqlOutboxCommand>();
 
@@ -73,7 +78,7 @@ public class NpgSqlOutboxCommandStore(string connectionString, string tableName,
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 
-        transaction.Commit();
+        await transaction.CommitAsync(cancellationToken);
     }
 
     public void CreateSchema()

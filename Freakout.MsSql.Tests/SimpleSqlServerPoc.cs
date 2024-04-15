@@ -115,15 +115,13 @@ public class SimpleSqlServerPoc : FixtureBase
         Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));
     }
 
-    async Task AddOutboxCommandUsingScopedOutboxAppenderAsync(ServiceProvider provider, object command)
+    static async Task AddOutboxCommandUsingScopedOutboxAppenderAsync(ServiceProvider provider, object command)
     {
         using var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
         var outbox = scope.ServiceProvider.GetRequiredService<IOutbox>();
 
         await outbox.AddOutboxCommandAsync(command);
-
-
     }
 
     async Task AddOutboxCommandAsync(object command)

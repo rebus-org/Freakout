@@ -16,7 +16,7 @@ namespace Freakout.MsSql;
 public static class FreakoutSqlConnectionExtensions
 {
     /// <summary>
-    /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
+    /// Adds the given <paramref name="command"/> to the store as part of the SQL transaction. The command will be added to the store
     /// when the transaction is committed.
     /// </summary>
     public static void AddOutboxCommand(this DbTransaction transaction, object command, Dictionary<string, string> headers = null)
@@ -36,7 +36,7 @@ public static class FreakoutSqlConnectionExtensions
     }
 
     /// <summary>
-    /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
+    /// Adds the given <paramref name="command"/> to the store as part of the SQL transaction. The command will be added to the store
     /// when the transaction is committed.
     /// </summary>
     public static async Task AddOutboxCommandAsync(this DbTransaction transaction, object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)

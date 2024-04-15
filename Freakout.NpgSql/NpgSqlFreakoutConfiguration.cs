@@ -2,6 +2,10 @@
 
 namespace Freakout.NpgSql;
 
+/// <summary>
+/// Freakout configuration for using PostgreSQL as the store.
+/// </summary>
+/// <param name="connectionString">Configures the connection string to use to connect to Postgres</param>
 public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConfiguration
 {
     /// <summary>
@@ -39,6 +43,6 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
             return commandStore;
         });
 
-        services.AddScoped<IOutbox>(p => new NpgSqlOutbox(connectionString));
+        services.AddScoped<IOutbox>(_ => new NpgSqlOutbox(connectionString));
     }
 }

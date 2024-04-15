@@ -1,4 +1,8 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using Freakout.Internals;
 using Freakout.Serialization;
 using Npgsql;
@@ -13,7 +17,7 @@ namespace Freakout.NpgSql;
 public static class FreakoutNpgsqlConnectionExtensions
 {
     /// <summary>
-    /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
+    /// Adds the given <paramref name="command"/> to the store as part of the SQL transaction. The command will be added to the store
     /// when the transaction is committed.
     /// </summary>
     public static void AddOutboxCommand(this DbTransaction transaction, object command, Dictionary<string, string> headers = null)
@@ -33,7 +37,7 @@ public static class FreakoutNpgsqlConnectionExtensions
     }
 
     /// <summary>
-    /// Adds the given <paramref name="command"/> to the store as par of the SQL transaction. The command will be added to the store
+    /// Adds the given <paramref name="command"/> to the store as part of the SQL transaction. The command will be added to the store
     /// when the transaction is committed.
     /// </summary>
     public static async Task AddOutboxCommandAsync(this DbTransaction transaction, object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
