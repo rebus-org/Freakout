@@ -41,3 +41,6 @@
 
 ## 0.0.14
 * Move internals into internals folders
+
+## 0.0.15
+* Lose the dependency on Microsoft.CSharp when it isn't necessary
