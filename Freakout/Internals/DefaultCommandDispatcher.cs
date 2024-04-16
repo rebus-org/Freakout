@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Freakout.Internals.Dispatch;
+namespace Freakout.Internals;
 
-class FreakoutOutboxCommandDispatcher(ICommandSerializer commandSerializer, IServiceScopeFactory serviceScopeFactory) : IOutboxCommandDispatcher
+class DefaultCommandDispatcher(ICommandSerializer commandSerializer, IServiceScopeFactory serviceScopeFactory) : ICommandDispatcher
 {
     readonly ConcurrentDictionary<Type, Func<object, CancellationToken, Task>> _invokers = new();
 

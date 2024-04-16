@@ -1,12 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Freakout.Internals.Dispatch;
+namespace Freakout;
 
 /// <summary>
-/// Interface of Freakout's command dispatcher. This one basically defines what it means to process an <see cref="OutboxCommand"/>.
+/// Interface of Freakout's command dispatcher. This one defines what it means to process an <see cref="OutboxCommand"/> and how it's done.
 /// </summary>
-public interface IOutboxCommandDispatcher
+public interface ICommandDispatcher
 {
     /// <summary>
     /// This method will be called by Freakout to process the <paramref name="outboxCommand"/>. If it throws an exception,

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Freakout.Internals.Dispatch;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nito.AsyncEx;
@@ -10,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace Freakout.Internals;
 
-class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxCommandDispatcher dispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
+class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispatcher dispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
     readonly AsyncAutoResetEvent AutoResetEvent = new();
 
@@ -42,21 +41,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
                     using var batch = await store.GetPendingOutboxCommandsAsync(stoppingToken);
                     using var scope = new FreakoutContextScope(batch.FreakoutContext);
 
-                    foreach (var command in batch)
-                    {
-                        logger.LogDebug("Executing store command {command}", command);
-
-                        try
-                        {
-                            await dispatcher.ExecuteAsync(command, stoppingToken);
-
-                            logger.LogDebug("Successfully executed store command {command}", command);
-                        }
-                        catch (Exception exception)
-                        {
-                            throw new ApplicationException($"Could not execute command {command}", exception);
-                        }
-                    }
+                    await dispatcher.ExecuteAsync(batch, stoppingToken);
 
                     await batch.CompleteAsync(stoppingToken);
                 }

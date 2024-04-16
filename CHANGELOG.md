@@ -56,3 +56,6 @@
 
 ## 0.0.19
 * Change to use common format for stored commands
+
+## 0.0.20
+* Factor batch dispatch out into separate service to enable plugging in other batch dispatch strategies

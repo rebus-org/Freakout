@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Freakout.Internals;
-using Freakout.Internals.Dispatch;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 // ReSharper disable SimplifyLinqExpressionUseAll
 
@@ -37,7 +37,7 @@ public static class FreakoutServiceCollectionExtensions
 
             var freakoutBackgroundService = new FreakoutBackgroundService(
                 configuration: configuration,
-                dispatcher: p.GetRequiredService<IOutboxCommandDispatcher>(),
+                dispatcher: p.GetRequiredService<IBatchDispatcher>(),
                 store: p.GetRequiredService<IOutboxCommandStore>(),
                 logger: p.GetLoggerFor<FreakoutBackgroundService>()
             );
@@ -46,7 +46,12 @@ public static class FreakoutServiceCollectionExtensions
 
         services.AddSingleton(configuration.CommandSerializer);
 
-        services.AddSingleton<IOutboxCommandDispatcher, FreakoutOutboxCommandDispatcher>();
+        services.TryAddSingleton<ICommandDispatcher, DefaultCommandDispatcher>();
+        
+        services.TryAddSingleton<IBatchDispatcher>(p => new DefaultBatchDispatcher(
+            commandDispatcher: p.GetRequiredService<ICommandDispatcher>(),
+            logger: p.GetLoggerFor<DefaultBatchDispatcher>()
+        ));
 
         // let the concrete configuration make its registrations
         configuration.InvokeConfigureServices(services);

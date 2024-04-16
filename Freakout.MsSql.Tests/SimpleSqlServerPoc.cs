@@ -69,8 +69,6 @@ public class SimpleSqlServerPoc : FixtureBase
         );
 
         Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));
-
-        await Task.Delay(TimeSpan.FromSeconds(100));
     }
 
     [Test]

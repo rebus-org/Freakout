@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
-using Freakout.Internals.Dispatch;
+using Freakout.Internals;
 using Freakout.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -14,7 +14,7 @@ using Testy;
 namespace Freakout.Tests.Dispatch;
 
 [TestFixture]
-public class TestFreakoutOutboxCommandDispatcher : FixtureBase
+public class TestDefaultCommandDispatcher : FixtureBase
 {
     SystemTextJsonCommandSerializer _serializer;
 
@@ -32,7 +32,7 @@ public class TestFreakoutOutboxCommandDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(() => dispatcher.ExecuteAsync(GetOutboxCommand(new SomeCommand())));
 
@@ -51,7 +51,7 @@ public class TestFreakoutOutboxCommandDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej")));
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej med dig")));
@@ -100,7 +100,7 @@ SCOPE 'Dispatch 10000000 commands' completed in 30029,7693 ms | 0,00300297693 ms
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new FreakoutOutboxCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         using var _ = TimerScope($"Dispatch {count} commands", count);
 
