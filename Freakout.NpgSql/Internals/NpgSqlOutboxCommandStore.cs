@@ -44,6 +44,8 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
                 var headers = HeaderSerializer.DeserializeFromString((string)reader["headers"]);
                 var payload = (byte[])reader["payload"];
 
+                headers[HeaderKeys.CommandId] = id.ToString();
+
                 outboxCommands.Add(new NpgsqlOutboxCommand(id, time, headers, payload));
             }
 

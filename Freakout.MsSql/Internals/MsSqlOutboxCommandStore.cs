@@ -47,6 +47,8 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
                 var headers = HeaderSerializer.DeserializeFromString((string)reader["Headers"]);
                 var payload = (byte[])reader["Payload"];
 
+                headers[HeaderKeys.CommandId] = id.ToString();
+
                 outboxCommands.Add(new MsSqlOutboxCommand(id, time, headers, payload));
             }
 

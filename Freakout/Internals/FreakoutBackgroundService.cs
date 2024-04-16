@@ -54,7 +54,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IOutboxComm
                         }
                         catch (Exception exception)
                         {
-                            throw new ApplicationException($"Could not execute store command {command}", exception);
+                            throw new ApplicationException($"Could not execute command {command}", exception);
                         }
                     }
 
