@@ -53,3 +53,6 @@
 
 ## 0.0.18
 * Generate sequential GUIDs
+
+## 0.0.19
+* Change to use common format for stored commands
