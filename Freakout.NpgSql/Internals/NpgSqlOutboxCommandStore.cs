@@ -35,18 +35,16 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-            var outboxCommands = new List<NpgsqlOutboxCommand>();
+            var outboxCommands = new List<PersistentOutboxCommand>();
 
             while (await reader.ReadAsync(cancellationToken))
             {
                 var id = (Guid)reader["id"];
-                var time = new DateTimeOffset((DateTime)reader["time"]);
+                var createdAt = new DateTimeOffset((DateTime)reader["created_at"]);
                 var headers = HeaderSerializer.DeserializeFromString((string)reader["headers"]);
                 var payload = (byte[])reader["payload"];
 
-                headers[HeaderKeys.CommandId] = id.ToString();
-
-                outboxCommands.Add(new NpgsqlOutboxCommand(id, time, headers, payload));
+                outboxCommands.Add(new PersistentOutboxCommand(id, createdAt, headers, payload));
             }
 
             if (!outboxCommands.Any())
@@ -72,7 +70,7 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
         }
     }
 
-    async Task CompleteAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, List<NpgsqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
+    async Task CompleteAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, List<PersistentOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
@@ -96,7 +94,7 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
 CREATE TABLE IF NOT EXISTS ""{schemaName}"".""{tableName}"" (
     ""id"" UUID PRIMARY KEY,
-    ""time"" TIMESTAMPTZ NOT NULL,
+    ""created_at"" TIMESTAMPTZ NOT NULL,
     ""headers"" JSONB,
     ""payload"" BYTEA,
     ""completed"" BOOLEAN NOT NULL DEFAULT FALSE

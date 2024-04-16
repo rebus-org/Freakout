@@ -6,11 +6,6 @@
 public static class HeaderKeys
 {
     /// <summary>
-    /// The ID that the command has in the data store
-    /// </summary>
-    public const string CommandId = "cmd-id";
-
-    /// <summary>
     /// Type information for the (de)serializer to use to be able to construct a command object
     /// </summary>
     public const string CommandType = "cmd-type";

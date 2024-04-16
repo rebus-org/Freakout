@@ -90,7 +90,7 @@ public static class FreakoutSqlConnectionExtensions
 
     static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, MsSqlFreakoutConfiguration configuration)
     {
-        cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [Time], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
+        cmd.CommandText = $"INSERT INTO [{configuration.SchemaName}].[{configuration.TableName}] ([Id], [CreatedAt], [Headers], [Payload]) VALUES (@id, SYSDATETIMEOFFSET(), @headers, @payload)";
         cmd.Parameters.Add(new SqlParameter("id", SequentialGuidGenerator.Instance.NewGuid()));
         cmd.Parameters.Add(new SqlParameter("headers", headers));
         cmd.Parameters.Add(new SqlParameter("payload", bytes));

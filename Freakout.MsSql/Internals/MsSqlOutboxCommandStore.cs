@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Freakout.Serialization;
 using Microsoft.Data.SqlClient;
 using Nito.Disposables;
-
 // ReSharper disable AccessToDisposedClosure
 // ReSharper disable UseAwaitUsing
 
@@ -38,18 +37,16 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-            var outboxCommands = new List<MsSqlOutboxCommand>();
+            var outboxCommands = new List<PersistentOutboxCommand>();
 
             while (await reader.ReadAsync(cancellationToken))
             {
                 var id = (Guid)reader["Id"];
-                var time = (DateTimeOffset)reader["Time"];
+                var createdAt = (DateTimeOffset)reader["CreatedAt"];
                 var headers = HeaderSerializer.DeserializeFromString((string)reader["Headers"]);
                 var payload = (byte[])reader["Payload"];
 
-                headers[HeaderKeys.CommandId] = id.ToString();
-
-                outboxCommands.Add(new MsSqlOutboxCommand(id, time, headers, payload));
+                outboxCommands.Add(new PersistentOutboxCommand(id, createdAt, headers, payload));
             }
 
             if (!outboxCommands.Any())
@@ -75,7 +72,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
         }
     }
 
-    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<MsSqlOutboxCommand> outboxCommands, CancellationToken cancellationToken)
+    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<PersistentOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
@@ -101,7 +98,7 @@ IF NOT EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_i
 BEGIN
     CREATE TABLE [{schemaName}].[{tableName}] (
         [Id] UNIQUEIDENTIFIER,
-        [Time] DATETIMEOFFSET(3) NOT NULL,
+        [CreatedAt] DATETIMEOFFSET(3) NOT NULL,
         [Headers] NVARCHAR(MAX),
         [Payload] VARBINARY(MAX),
         [Completed] BIT NOT NULL DEFAULT(0),

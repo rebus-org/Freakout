@@ -90,7 +90,7 @@ public static class FreakoutNpgsqlConnectionExtensions
 
     static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, NpgSqlFreakoutConfiguration configuration)
     {
-        cmd.CommandText = $@"INSERT INTO ""{configuration.SchemaName}"".""{configuration.TableName}"" (""id"", ""time"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
+        cmd.CommandText = $@"INSERT INTO ""{configuration.SchemaName}"".""{configuration.TableName}"" (""id"", ""created_at"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
 
         cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = SequentialGuidGenerator.Instance.NewGuid() });
         cmd.Parameters.Add(new NpgsqlParameter("headers", NpgsqlDbType.Jsonb) { Value = headers });

@@ -74,9 +74,6 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
 
         Assert.That(command.Headers, Contains.Key(HeaderKeys.CommandType).WithValue(typeof(SomeKindOfCommand).GetSimpleAssemblyQualifiedName()),
             "The headers must contain type information");
-
-        Assert.That(command.Headers, Contains.Key(HeaderKeys.CommandId),
-            "The headers must contain the command ID");
     }
 
     [Test]
