@@ -77,7 +77,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1 WHERE [Id] IN ({ids})";
+        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1, [ExecutedAt] = SYSDATETIMEOFFSET() WHERE [Id] IN ({ids})";
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 
@@ -102,6 +102,7 @@ BEGIN
         [Headers] NVARCHAR(MAX),
         [Payload] VARBINARY(MAX),
         [Completed] BIT NOT NULL DEFAULT(0),
+        [ExecutedAt] DATETIMEOFFSET(3) NULL,
 
         PRIMARY KEY ([Id])
     )

@@ -75,7 +75,7 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
         using var command = connection.CreateCommand();
-        command.CommandText = $@"UPDATE ""{schemaName}"".""{tableName}"" SET ""completed"" = TRUE WHERE ""id"" IN ({ids});";
+        command.CommandText = $@"UPDATE ""{schemaName}"".""{tableName}"" SET ""completed"" = TRUE, ""executed_at"" = CURRENT_TIMESTAMP WHERE ""id"" IN ({ids});";
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 
@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS ""{schemaName}"".""{tableName}"" (
     ""created_at"" TIMESTAMPTZ NOT NULL,
     ""headers"" JSONB,
     ""payload"" BYTEA,
-    ""completed"" BOOLEAN NOT NULL DEFAULT FALSE
+    ""completed"" BOOLEAN NOT NULL DEFAULT FALSE,
+    ""executed_at"" TIMESTAMPTZ NULL
 );
 
 ";
