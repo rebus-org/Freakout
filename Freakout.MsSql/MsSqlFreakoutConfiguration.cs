@@ -24,17 +24,12 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
     /// </summary>
     public bool AutomaticallyCreateSchema { get; set; } = true;
 
-    /// <summary>
-    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch.
-    /// </summary>
-    public int CommandProcessingBatchSize { get; set; } = 1;
-
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
-            var commandStore = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
+            var commandStore = new MsSqlOutboxCommandStore(connectionString, TableName, SchemaName);
 
             if (AutomaticallyCreateSchema)
             {

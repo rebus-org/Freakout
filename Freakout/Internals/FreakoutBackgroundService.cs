@@ -38,7 +38,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispa
 
                 try
                 {
-                    using var batch = await store.GetPendingOutboxCommandsAsync(stoppingToken);
+                    using var batch = await store.GetPendingOutboxCommandsAsync(configuration.CommandProcessingBatchSize, stoppingToken);
                     using var scope = new FreakoutContextScope(batch.FreakoutContext);
 
                     await dispatcher.ExecuteAsync(batch, stoppingToken);

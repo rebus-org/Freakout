@@ -7,7 +7,7 @@ namespace Freakout.NpgSql;
 /// Freakout configuration for using PostgreSQL as the store.
 /// </summary>
 /// <param name="connectionString">Configures the connection string to use to connect to Postgres</param>
-public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConfiguration
+public class NpgsqlFreakoutConfiguration(string connectionString) : FreakoutConfiguration
 {
     /// <summary>
     /// Configures the store table schema name. Defaults to "public".
@@ -24,17 +24,12 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
     /// </summary>
     public bool AutomaticallyCreateSchema { get; set; } = true;
 
-    /// <summary>
-    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch.
-    /// </summary>
-    public int CommandProcessingBatchSize { get; set; } = 1;
-
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IOutboxCommandStore>(_ =>
         {
-            var commandStore = new NpgSqlOutboxCommandStore(connectionString, TableName, SchemaName, CommandProcessingBatchSize);
+            var commandStore = new NpgsqlOutboxCommandStore(connectionString, TableName, SchemaName);
 
             if (AutomaticallyCreateSchema)
             {
@@ -44,6 +39,6 @@ public class NpgSqlFreakoutConfiguration(string connectionString) : FreakoutConf
             return commandStore;
         });
 
-        services.AddScoped<IOutbox, NpgSqlOutbox>();
+        services.AddScoped<IOutbox, NpgsqlOutbox>();
     }
 }

@@ -12,5 +12,5 @@ public interface IOutboxCommandStore
     /// Must return an "store batch", which is 0..n store commands and a "completion method" (i.e. a way of marking
     /// the contained store commands as handled).
     /// </summary>
-    Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default);
+    Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(int commandProcessingBatchSize = 1, CancellationToken cancellationToken = default);
 }

@@ -30,6 +30,11 @@ public abstract class FreakoutConfiguration
     public TimeSpan OutboxPollInterval { get; set; } = TimeSpan.FromMinutes(1);
 
     /// <summary>
+    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch.
+    /// </summary>
+    public int CommandProcessingBatchSize { get; set; } = 1;
+
+    /// <summary>
     /// Configures the command serializer. Defaults to <see cref="SystemTextJsonCommandSerializer"/> which uses System.Text.Json to serialize commands.
     /// </summary>
     public ICommandSerializer CommandSerializer { get; set; } = new SystemTextJsonCommandSerializer();

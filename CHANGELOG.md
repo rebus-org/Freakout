@@ -59,3 +59,4 @@
 
 ## 0.0.20
 * Factor batch dispatch out into separate service to enable plugging in other batch dispatch strategies
+* Make options for individually marking commands as succeeded/failed more sophisticated

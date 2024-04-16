@@ -7,7 +7,7 @@ using Npgsql;
 
 namespace Freakout.NpgSql.Internals;
 
-class NpgSqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
+class NpgsqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 {
     public void AddOutboxCommand(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {

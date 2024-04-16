@@ -14,7 +14,6 @@ using Testy.General;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable ConvertToUsingDeclaration
 // ReSharper disable MethodSupportsCancellation
-
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Freakout.Tests.Contracts;

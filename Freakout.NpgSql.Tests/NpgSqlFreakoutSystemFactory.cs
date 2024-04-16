@@ -8,15 +8,15 @@ using Testy.General;
 
 namespace Freakout.NpgSql.Tests;
 
-public class NpgSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
+public class NpgsqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
 {
     protected override void ConfigureServices(IServiceCollection services)
     {
         var tableName = $"outbox-{Guid.NewGuid():N}";
 
-        disposables.Add(new DisposableCallback(() => NpgSqlTestHelper.DropTable(tableName)));
+        disposables.Add(new DisposableCallback(() => NpgsqlTestHelper.DropTable(tableName)));
 
-        var configuration = new NpgSqlFreakoutConfiguration(NpgSqlTestHelper.ConnectionString)
+        var configuration = new NpgsqlFreakoutConfiguration(NpgsqlTestHelper.ConnectionString)
         {
             OutboxPollInterval = TimeSpan.FromSeconds(1),
             TableName = tableName
@@ -29,7 +29,7 @@ public class NpgSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
     {
         IFreakoutContext ContextFactory()
         {
-            var connection = new NpgsqlConnection(NpgSqlTestHelper.ConnectionString);
+            var connection = new NpgsqlConnection(NpgsqlTestHelper.ConnectionString);
             connection.Open();
             var transaction = connection.BeginTransaction();
             return new NpgsqlFreakoutContext(connection, transaction);

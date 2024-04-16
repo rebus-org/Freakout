@@ -11,11 +11,9 @@ using Nito.Disposables;
 
 namespace Freakout.MsSql.Internals;
 
-class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int processingBatchSize) : IOutboxCommandStore
+class MsSqlOutboxCommandStore(string connectionString, string tableName, string schemaName) : IOutboxCommandStore
 {
-    readonly string _selectQuery = $"SELECT TOP {processingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK, READPAST) WHERE [Completed] = 0 ORDER BY [Id]";
-
-    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
+    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(int commandProcessingBatchSize, CancellationToken cancellationToken = default)
     {
         // Collect disposables in this one 👇 Remember to consider disposal in all possible exit paths from this method!!
         var disposables = new CollectionDisposable();
@@ -32,7 +30,9 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             using var command = connection.CreateCommand();
 
-            command.CommandText = _selectQuery;
+            var query = $"SELECT TOP {commandProcessingBatchSize} * FROM [{schemaName}].[{tableName}] WITH (ROWLOCK, UPDLOCK, READPAST) WHERE [Completed] = 0 ORDER BY [Id]";
+
+            command.CommandText = query;
             command.Transaction = transaction;
 
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -74,10 +74,14 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
     async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<PendingOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
-        var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
+        var completedIds = outboxCommands
+            .Where(c => c.State is SuccessfullyExecutedCommandState)
+            .Select(c => $"'{c.Id}'");
+
+        var idString = string.Join(",", completedIds);
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1, [ExecutedAt] = SYSDATETIMEOFFSET() WHERE [Id] IN ({ids})";
+        command.CommandText = $"UPDATE [{schemaName}].[{tableName}] SET [Completed] = 1, [ExecutedAt] = SYSDATETIMEOFFSET() WHERE [Id] IN ({idString})";
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 

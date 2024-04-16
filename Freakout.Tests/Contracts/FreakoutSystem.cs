@@ -16,6 +16,8 @@ public class FreakoutSystem(ServiceProvider ServiceProvider, Func<IFreakoutConte
     public IOutbox Outbox => ServiceProvider.GetRequiredService<IOutbox>();
 
     public IOutboxCommandStore OutboxCommandStore => ServiceProvider.GetRequiredService<IOutboxCommandStore>();
+    
+    public ICommandSerializer CommandSerializer => ServiceProvider.GetRequiredService<ICommandSerializer>();
 
     public FreakoutTestScope CreateScope() => new(contextFactory(), commitAction, disposeAction);
 

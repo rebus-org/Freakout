@@ -88,7 +88,7 @@ public static class FreakoutNpgsqlConnectionExtensions
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, NpgSqlFreakoutConfiguration configuration)
+    static void SetQueryAndParameters(string headers, byte[] bytes, DbCommand cmd, NpgsqlFreakoutConfiguration configuration)
     {
         cmd.CommandText = $@"INSERT INTO ""{configuration.SchemaName}"".""{configuration.TableName}"" (""id"", ""created_at"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
 
@@ -97,6 +97,6 @@ public static class FreakoutNpgsqlConnectionExtensions
         cmd.Parameters.Add(new NpgsqlParameter("payload", NpgsqlDbType.Bytea) { Value = bytes });
     }
 
-    static NpgSqlFreakoutConfiguration GetConfiguration() => Globals.Get<FreakoutConfiguration>() as NpgSqlFreakoutConfiguration
+    static NpgsqlFreakoutConfiguration GetConfiguration() => Globals.Get<FreakoutConfiguration>() as NpgsqlFreakoutConfiguration
                                                              ?? throw new InvalidOperationException("Could not retrieve global, PostgreSQL-specific Freakout configuration");
 }

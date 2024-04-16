@@ -7,7 +7,7 @@ using Testcontainers.PostgreSql;
 namespace Freakout.NpgSql.Tests;
 
 [SetUpFixture]
-class NpgSqlTestHelper
+class NpgsqlTestHelper
 {
     static readonly CollectionDisposable Disposables = new();
 

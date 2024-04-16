@@ -9,11 +9,9 @@ using Npgsql;
 
 namespace Freakout.NpgSql.Internals;
 
-class NpgSqlOutboxCommandStore(string connectionString, string tableName, string schemaName, int commandProcessingBatchSize) : IOutboxCommandStore
+class NpgsqlOutboxCommandStore(string connectionString, string tableName, string schemaName) : IOutboxCommandStore
 {
-    readonly string _selectQuery = $@"SELECT * FROM ""{schemaName}"".""{tableName}"" WHERE ""completed"" = FALSE ORDER BY ""id"" FOR UPDATE SKIP LOCKED LIMIT {commandProcessingBatchSize};";
-
-    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(CancellationToken cancellationToken = default)
+    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(int commandProcessingBatchSize, CancellationToken cancellationToken = default)
     {
         // Collect disposables in this one 👇 Remember to consider disposal in all possible exit paths from this method!!
         var disposables = new CollectionDisposable();
@@ -30,7 +28,9 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
             using var command = connection.CreateCommand();
 
-            command.CommandText = _selectQuery;
+            var query = $"""SELECT * FROM "{schemaName}"."{tableName}" WHERE "completed" = FALSE ORDER BY "id" FOR UPDATE SKIP LOCKED LIMIT {commandProcessingBatchSize};""";
+
+            command.CommandText = query;
             command.Transaction = transaction;
 
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -72,10 +72,14 @@ class NpgSqlOutboxCommandStore(string connectionString, string tableName, string
 
     async Task CompleteAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, List<PendingOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
-        var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
+        var completedIds = outboxCommands
+            .Where(c => c.State is SuccessfullyExecutedCommandState)
+            .Select(c => $"'{c.Id}'");
+
+        var idString = string.Join(",", completedIds);
 
         using var command = connection.CreateCommand();
-        command.CommandText = $@"UPDATE ""{schemaName}"".""{tableName}"" SET ""completed"" = TRUE, ""executed_at"" = CURRENT_TIMESTAMP WHERE ""id"" IN ({ids});";
+        command.CommandText = $@"UPDATE ""{schemaName}"".""{tableName}"" SET ""completed"" = TRUE, ""executed_at"" = CURRENT_TIMESTAMP WHERE ""id"" IN ({idString});";
         command.Transaction = transaction;
         await command.ExecuteNonQueryAsync(cancellationToken);
 
