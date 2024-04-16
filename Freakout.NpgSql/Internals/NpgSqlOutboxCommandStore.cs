@@ -74,7 +74,10 @@ class NpgsqlOutboxCommandStore(string connectionString, string tableName, string
     {
         var completedIds = outboxCommands
             .Where(c => c.State is SuccessfullyExecutedCommandState)
-            .Select(c => $"'{c.Id}'");
+            .Select(c => $"'{c.Id}'")
+            .ToList();
+
+        if (!completedIds.Any()) return;
 
         var idString = string.Join(",", completedIds);
 

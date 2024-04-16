@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Nito.Disposables;
 
 namespace Freakout.Tests.Contracts;
@@ -12,6 +13,8 @@ public abstract class AbstractFreakoutSystemFactory : IFreakoutSystemFactory
         services ??= new ServiceCollection();
 
         ConfigureServices(services);
+
+        services.AddLogging(builder => builder.AddConsole());
 
         var provider = services.BuildServiceProvider();
 

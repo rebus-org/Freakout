@@ -57,6 +57,6 @@
 ## 0.0.19
 * Change to use common format for stored commands
 
-## 0.0.20
+## 0.0.21
 * Factor batch dispatch out into separate service to enable plugging in other batch dispatch strategies
 * Make options for individually marking commands as succeeded/failed more sophisticated
