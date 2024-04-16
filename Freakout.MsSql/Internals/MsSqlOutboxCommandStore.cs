@@ -37,7 +37,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-            var outboxCommands = new List<PersistentOutboxCommand>();
+            var outboxCommands = new List<PendingOutboxCommand>();
 
             while (await reader.ReadAsync(cancellationToken))
             {
@@ -46,7 +46,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
                 var headers = HeaderSerializer.DeserializeFromString((string)reader["Headers"]);
                 var payload = (byte[])reader["Payload"];
 
-                outboxCommands.Add(new PersistentOutboxCommand(id, createdAt, headers, payload));
+                outboxCommands.Add(new PendingOutboxCommand(id, createdAt, headers, payload));
             }
 
             if (!outboxCommands.Any())
@@ -72,7 +72,7 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
         }
     }
 
-    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<PersistentOutboxCommand> outboxCommands, CancellationToken cancellationToken)
+    async Task CompleteAsync(SqlConnection connection, SqlTransaction transaction, List<PendingOutboxCommand> outboxCommands, CancellationToken cancellationToken)
     {
         var ids = string.Join(",", outboxCommands.Select(c => $"'{c.Id}'"));
 
