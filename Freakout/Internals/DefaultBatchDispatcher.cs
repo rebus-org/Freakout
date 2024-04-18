@@ -8,7 +8,7 @@ namespace Freakout.Internals;
 
 class DefaultBatchDispatcher(ICommandDispatcher commandDispatcher, ILogger<DefaultBatchDispatcher> logger) : IBatchDispatcher
 {
-    public async Task ExecuteAsync(OutboxCommandBatch batch, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(OutboxCommandBatch batch, CancellationToken cancellationToken = default)
     {
         foreach (var command in batch)
         {

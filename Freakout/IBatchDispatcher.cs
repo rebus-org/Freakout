@@ -12,5 +12,5 @@ public interface IBatchDispatcher
     /// This method will be called by Freakout to process the <paramref name="batch"/>. If it throws an exception,
     /// handling is considered as FAILED - if it doesn't, then it's considered SUCCESSFUL.
     /// </summary>
-    Task ExecuteAsync(OutboxCommandBatch batch, CancellationToken cancellationToken);
+    Task ExecuteAsync(OutboxCommandBatch batch, CancellationToken cancellationToken = default);
 }
