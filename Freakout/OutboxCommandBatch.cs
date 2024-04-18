@@ -22,8 +22,11 @@ public class OutboxCommandBatch(IFreakoutContext freakoutContext, IReadOnlyList<
     /// "Completes" the batch, whatever that means ;) In most cases this will either mark the successfully executed commands as successfully executed,
     /// or simply delete all the executed commands, but it is entirely up to the <see cref="IOutboxCommandStore"/> implementation to provide the logic
     /// of what it means to complete the <see cref="OutboxCommandBatch"/>.
+    /// This method is internal (at least for now), because it is called by <see cref="FreakoutBackgroundService"/>. If one wants to affect completion logic,
+    /// there's plenty of ways to do that, e.g. by decorating <see cref="IOutboxCommandStore"/> and wrap the <see cref="OutboxCommandBatch"/> in a customized
+    /// <see cref="OutboxCommandBatch"/> with additional or different logic.
     /// </summary>
-    public Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
+    internal Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
     /// <summary>
     /// Gets the Freakout context that wraps the transaction that this command batch does its work in
