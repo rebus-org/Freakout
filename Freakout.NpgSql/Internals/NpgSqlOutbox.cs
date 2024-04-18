@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Npgsql;
+
 // ReSharper disable MethodHasAsyncOverloadWithCancellation
 
 namespace Freakout.NpgSql.Internals;

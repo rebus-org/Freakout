@@ -51,10 +51,13 @@ class DefaultCommandDispatcher(ICommandSerializer commandSerializer, IServiceSco
     {
         const string methodName = nameof(ExecuteOutboxCommandGeneric);
 
+        var type = GetType();
+        
         // get method to call
-        var methodInfo = GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)
-                         ?? throw new ArgumentException($"Could not get method '{methodName}'.");
+        var methodInfo = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)
+                         ?? throw new ArgumentException($"Could not get non-public instance method '{methodName}' from {type}");
 
+        // close the generic method
         var genericMethod = methodInfo.MakeGenericMethod(commandType);
 
         // get reference to this

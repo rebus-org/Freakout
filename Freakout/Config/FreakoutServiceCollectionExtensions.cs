@@ -3,7 +3,6 @@ using System.Linq;
 using Freakout.Internals;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 // ReSharper disable SimplifyLinqExpressionUseAll
 

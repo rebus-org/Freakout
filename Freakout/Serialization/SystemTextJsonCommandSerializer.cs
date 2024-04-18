@@ -49,7 +49,7 @@ public class SystemTextJsonCommandSerializer : ICommandSerializer
             throw new FormatException($"The '{HeaderKeys.ContentType}' was '{contentTypeHeader}' and not '{JsonContentType}' as expected");
         }
 
-        var typeHeader = outboxCommand.Headers.GetValueOrThrow(HeaderKeys.CommandType);
+        var typeName = outboxCommand.Headers.GetValueOrThrow(HeaderKeys.CommandType);
 
         var type = LoadType();
 
@@ -61,11 +61,11 @@ public class SystemTextJsonCommandSerializer : ICommandSerializer
         {
             try
             {
-                return Type.GetType(typeHeader) ?? throw new ArgumentException("Type was not found in the current app domain");
+                return Type.GetType(typeName) ?? throw new ArgumentException("Type was not found in the current app domain");
             }
             catch (Exception exception)
             {
-                throw new ArgumentException($"Could not load type '{typeHeader}'", exception);
+                throw new ArgumentException($"Could not load type '{typeName}'", exception);
             }
         }
     }
