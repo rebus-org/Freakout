@@ -11,7 +11,7 @@ namespace Freakout;
 /// Represents a batch of store commands to be processed. When completed without errors, Freakout will call its completion method, which
 /// should cause the store to mark the contained commands as handled.
 /// </summary>
-public class OutboxCommandBatch(IFreakoutContext freakoutContext, IEnumerable<PendingOutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync, Action dispose) : IEnumerable<PendingOutboxCommand>, IDisposable
+public class OutboxCommandBatch(IFreakoutContext freakoutContext, IReadOnlyList<PendingOutboxCommand> outboxCommands, Func<CancellationToken, Task> completeAsync, Action dispose) : IEnumerable<PendingOutboxCommand>, IDisposable
 {
     /// <summary>
     /// Gets an empty <see cref="OutboxCommandBatch"/>
