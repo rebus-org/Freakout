@@ -18,7 +18,12 @@ public class OutboxCommandBatch(IFreakoutContext freakoutContext, IEnumerable<Pe
     /// </summary>
     public static readonly OutboxCommandBatch Empty = new(new EmptyFreakoutContext(), Array.Empty<PendingOutboxCommand>(), _ => Task.CompletedTask, () => { });
 
-    internal Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
+    /// <summary>
+    /// "Completes" the batch, whatever that means ;) In most cases this will either mark the successfully executed commands as successfully executed,
+    /// or simply delete all the executed commands, but it is entirely up to the <see cref="IOutboxCommandStore"/> implementation to provide the logic
+    /// of what it means to complete the <see cref="OutboxCommandBatch"/>.
+    /// </summary>
+    public Task CompleteAsync(CancellationToken cancellationToken = default) => completeAsync(cancellationToken);
 
     /// <summary>
     /// Gets the Freakout context that wraps the transaction that this command batch does its work in
