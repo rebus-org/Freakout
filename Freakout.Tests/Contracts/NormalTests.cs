@@ -137,12 +137,11 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     {
         var events = new ConcurrentQueue<string>();
 
-        var services = new ServiceCollection();
-
-        services.AddCommandHandler<SomeKindOfCommandHandler>();
-        services.AddSingleton(events);
-
-        var system = _factory.Create(services);
+        var system = _factory.Create(before: services =>
+        {
+            services.AddCommandHandler<SomeKindOfCommandHandler>();
+            services.AddSingleton(events);
+        });
 
         var cts = Using(new CancellationTokenSource());
         Using(new DisposableCallback(cts.Cancel));
@@ -192,13 +191,13 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     {
         var done = new AsyncManualResetEvent();
         var events = new ConcurrentQueue<string>();
-        var services = new ServiceCollection();
 
-        services.AddSingleton(done);
-        services.AddSingleton(events);
-        services.AddCommandHandler<CommandHandler>();
-
-        var system = _factory.Create(services);
+        var system = _factory.Create(before: services =>
+        {
+            services.AddSingleton(done);
+            services.AddSingleton(events);
+            services.AddCommandHandler<CommandHandler>();
+        });
 
         var cts = Using(new CancellationTokenSource());
         Using(new DisposableCallback(cts.Cancel));

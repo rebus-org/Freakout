@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nito.Disposables;
 
@@ -8,11 +9,15 @@ public abstract class AbstractFreakoutSystemFactory : IFreakoutSystemFactory
 {
     protected readonly CollectionDisposable disposables = new();
 
-    public FreakoutSystem Create(IServiceCollection services = null)
+    public FreakoutSystem Create(Action<IServiceCollection> before = null, Action<IServiceCollection> after = null)
     {
-        services ??= new ServiceCollection();
+        var services = new ServiceCollection();
+
+        before?.Invoke(services);
 
         ConfigureServices(services);
+
+        after?.Invoke(services);
 
         services.AddLogging(builder => builder.AddConsole());
 

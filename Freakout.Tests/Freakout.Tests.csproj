@@ -12,6 +12,8 @@
 		<PackageReference Include="nito.asyncex" Version="5.1.2" />
 		<PackageReference Include="nunit" Version="4.1.0" />
 		<PackageReference Include="nunit3testadapter" Version="4.5.0" />
+		<PackageReference Include="polly" Version="8.3.1" />
+		<PackageReference Include="scrutor" Version="4.2.2" />
 		<PackageReference Include="testy" Version="0.9.0" />
 	</ItemGroup>
 

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Freakout.Serialization;
 using Nito.Disposables;
 using Npgsql;
+// ReSharper disable MethodHasAsyncOverloadWithCancellation
+// ReSharper disable UseAwaitUsing
 
 namespace Freakout.NpgSql.Internals;
 
