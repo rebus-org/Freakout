@@ -86,7 +86,22 @@ SCOPE 'Dispatch 10000000 commands' completed in 31529,0346 ms | 0,00315290345999
 SCOPE 'Dispatch 1000 commands' completed in 29,3767 ms | 0,0293767 ms/item | 34,040583183271096 items/ms
 SCOPE 'Dispatch 1000000 commands' completed in 3405,0657 ms | 0,0034050657 ms/item | 293,68008963821165 items/ms
 SCOPE 'Dispatch 10000000 commands' completed in 30029,7693 ms | 0,00300297693 ms/item | 333,0028912343326 items/ms
-              
+
+    After waiting for the 29th of May 2024 to come by:
+
+SCOPE 'Dispatch 1000 commands' completed in 31,8928 ms | 0,0318928 ms/item | 31,355039381929462 items/ms
+SCOPE 'Dispatch 1000000 commands' completed in 3675,3738 ms | 0,0036753738 ms/item | 272,08116899565425 items/ms              
+SCOPE 'Dispatch 10000000 commands' completed in 29720,7503 ms | 0,00297207503 ms/item | 336,46526077102436 items/ms
+       
+    After switching to IL-generated dispatcher:
+
+SCOPE 'Dispatch 1000 commands' completed in 34,6107 ms | 0,0346107 ms/item | 28,89279904769334 items/ms
+SCOPE 'Dispatch 1000000 commands' completed in 3900,4479 ms | 0,0039004479 ms/item | 256,3808120600714 items/ms
+SCOPE 'Dispatch 10000000 commands' completed in 35641,9579 ms | 0,00356419579 ms/item | 280,5682007721579 items/ms
+       
+    NOT IMPRESSED!! Switching back to the expression tree-based invoker:
+
+
      *
      */
     [TestCase(1000)]
