@@ -18,7 +18,7 @@ class DefaultCommandDispatcher(ICommandSerializer commandSerializer, IServiceSco
         var command = commandSerializer.Deserialize(outboxCommand);
         var type = command.GetType();
 
-        var invoker = _invokers.GetOrAdd(type, CreateInvokerWithCompiledExpression);
+        var invoker = _invokers.GetOrAdd(type, CreateInvokerWithIl);
 
         await invoker(command, cancellationToken);
     }
@@ -111,11 +111,9 @@ class DefaultCommandDispatcher(ICommandSerializer commandSerializer, IServiceSco
 
         // load "this" (first argument) onto the evaluation stack
         il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Castclass, type);
 
         // load the command parameter (second argument) and convert it
         il.Emit(OpCodes.Ldarg_1);
-        il.Emit(OpCodes.Castclass, commandType);
         il.Emit(OpCodes.Stloc_0); // store converted parameter into local
         il.Emit(OpCodes.Ldloc_0); // load converted parameter from local
 
@@ -123,8 +121,7 @@ class DefaultCommandDispatcher(ICommandSerializer commandSerializer, IServiceSco
         il.Emit(OpCodes.Ldarg_2);
 
         // call the generic method
-        il.Emit(OpCodes.Call, genericMethod);
-
+        il.Emit(OpCodes.Callvirt, genericMethod);
         // return the result of the call
         il.Emit(OpCodes.Ret);
 
