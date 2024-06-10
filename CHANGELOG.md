@@ -64,6 +64,8 @@
 ## 0.0.22
 * Add IL emit-based command dispatcher and make it the new default - thanks [Danielovich]
 
+## 0.0.23
+* Dodge `OperationCanceledException` in just the right way during shutdown
 
 
 [Danielovich]: https://github.com/Danielovich
