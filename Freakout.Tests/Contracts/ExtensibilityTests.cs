@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Freakout.Config;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Polly;
@@ -10,6 +11,7 @@ using Testy.Extensions;
 using Testy.General;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable AccessToDisposedClosure
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Freakout.Tests.Contracts;
 
@@ -35,15 +37,18 @@ public abstract class ExtensibilityTests<TFreakoutSystemFactory> : FixtureBase w
 
         var system = _factory.Create(after: services =>
         {
+            services.AddSingleton<CommandDispatchState>();
             services.AddSingleton(done);
             services.Decorate<ICommandDispatcher, PollyCommandDispatcher>();
+            services.AddCommandHandler<ThrowingCommandHandler>();
         });
 
         _ = system.StartCommandProcessorAsync(stop.Token);
 
-        using (system.CreateScope())
+        using (var scope = system.CreateScope())
         {
             await system.Outbox.AddOutboxCommandAsync("HEJ", cancellationToken: stop.Token);
+            scope.Complete();
         }
 
         if (!done.WaitOne(TimeSpan.FromSeconds(5)))
@@ -52,10 +57,22 @@ public abstract class ExtensibilityTests<TFreakoutSystemFactory> : FixtureBase w
         }
     }
 
-    class ThrowingCommandHandler(ManualResetEvent done) : ICommandHandler<string>
+    class CommandDispatchState
+    {
+        public int Count { get; set; }
+    }
+
+    class ThrowingCommandHandler(CommandDispatchState state, ManualResetEvent done) : ICommandHandler<string>
     {
         public async Task HandleAsync(string command, CancellationToken cancellationToken)
         {
+            state.Count++;
+            
+            if (state.Count < 4)
+            {
+                throw new AccessViolationException($"COUNT WAS {state.Count}");
+            }
+            
             done.Set();
         }
     }

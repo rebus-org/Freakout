@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
-using Freakout.Internals;
 using Freakout.Internals.Dispatchers;
 using Freakout.Serialization;
 using Microsoft.Extensions.DependencyInjection;
