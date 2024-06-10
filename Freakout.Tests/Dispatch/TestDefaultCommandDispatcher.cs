@@ -99,9 +99,23 @@ SCOPE 'Dispatch 1000 commands' completed in 34,6107 ms | 0,0346107 ms/item | 28,
 SCOPE 'Dispatch 1000000 commands' completed in 3900,4479 ms | 0,0039004479 ms/item | 256,3808120600714 items/ms
 SCOPE 'Dispatch 10000000 commands' completed in 35641,9579 ms | 0,00356419579 ms/item | 280,5682007721579 items/ms
        
-    NOT IMPRESSED!! Switching back to the expression tree-based invoker:
+    NOT IMPRESSED!! Switching back to the expression tree-based invoker.
 
 
+    New run with expression-based invoker (this time in Release mode):
+
+SCOPE 'Dispatch 1000 commands' completed in 30,0883 ms | 0,030088300000000002 ms/item | 33,23551014846302 items/ms
+SCOPE 'Dispatch 1000000 commands' completed in 2730,8531 ms | 0,0027308530999999997 ms/item | 366,18593654854595 items/ms
+SCOPE 'Dispatch 10000000 commands' completed in 23148,3344 ms | 0,00231483344 ms/item | 431,9965241214072 items/ms
+    
+    New run with Danielovich's modded IL invoker (also in Release mode):
+
+SCOPE 'Dispatch 1000 commands' completed in 38,6496 ms | 0,0386496 ms/item | 25,873488988243086 items/ms
+SCOPE 'Dispatch 1000000 commands' completed in 2650,4597 ms | 0,0026504596999999998 ms/item | 377,29304090154625 items/ms
+SCOPE 'Dispatch 10000000 commands' completed in 22555,6927 ms | 0,00225556927 ms/item | 443,34705801343 items/ms
+       
+
+       
      *
      */
     [TestCase(1000)]
