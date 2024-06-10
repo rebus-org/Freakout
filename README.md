@@ -2,6 +2,24 @@
 
 📤 Just a general outbox thing
 
+
+## What do you mean by "outbox"?
+
+An outbox is a simple mechanism that allows you to store outbound messages in an atomic ☢️ way as part of your normal transaction.
+
+It addresses the ubiquitous dilemma of which to do first: (1) commit your database transaction OR (2) whatever else you want to do.
+
+The problem is that (1) is generally inherently risky (database deadlocks, key violations, etc etc), and (2) is also generally risky (writing to a file share, communicating with a message broker, calling an external web service, etc.).
+
+Two risky things combined are very likely to fail! - which will leave your system in a state where either (1) or (2) was not carried out (depending on the order you chose to execute them in), because it failed.
+
+🆘 This problem can be addressed in many ways, e.g. by retrying, using a middleman with higher availability (e.g. a message broker), etc. etc.
+
+OR you could simply store information about which actions to perform in (2) as part of (1)!! 🤯 That's what the outbox does! 🤓
+
+
+## Until now, I have only seen outboxes built into messaging libraries - why now a separate library?
+
 Why? Because "outbox" is closer to your chosen type of persistence (SQL Server, Postgres, etc.) than to anything else.
 
 

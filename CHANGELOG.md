@@ -67,5 +67,7 @@
 ## 0.0.23
 * Dodge `OperationCanceledException` in just the right way during shutdown
 
+## 0.0.24
+* Add support for interfaceless command handlers
 
 [Danielovich]: https://github.com/Danielovich

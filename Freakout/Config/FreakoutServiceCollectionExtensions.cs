@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Freakout.Internals;
 using Freakout.Internals.Dispatchers;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +49,7 @@ public static class FreakoutServiceCollectionExtensions
         services.AddSingleton(configuration.CommandSerializer);
 
         services.TryAddSingleton<ICommandDispatcher, IlEmitCommandDispatcher>();
-        
+
         services.TryAddSingleton<IBatchDispatcher>(p => new DefaultBatchDispatcher(
             commandDispatcher: p.GetRequiredService<ICommandDispatcher>(),
             logger: p.GetLoggerFor<DefaultBatchDispatcher>()
@@ -74,6 +76,20 @@ public static class FreakoutServiceCollectionExtensions
         Globals.Set(configuration);
 
         services.AddSingleton(_ => new GlobalsClearer());
+    }
+
+    /// <summary>
+    /// Adds the type <typeparamref name="TCommandHandler"/> as a Freakout command handler, using the invoker function <paramref name="invoker"/> to invoke it.
+    /// </summary>
+    public static void AddCommandHandler<TCommandHandler, TCommand>(this IServiceCollection services, Func<TCommandHandler, TCommand, CancellationToken, Task> invoker) where TCommandHandler : class
+    {
+        if (services == null) throw new ArgumentNullException(nameof(services));
+        if (invoker == null) throw new ArgumentNullException(nameof(invoker));
+
+        var serviceType = typeof(ICommandHandler<>).MakeGenericType(typeof(TCommand));
+
+        services.AddScoped<TCommandHandler>();
+        services.AddScoped(serviceType, p => new DelegatingCommandHandler<TCommand>((cmd, token) => invoker(p.GetRequiredService<TCommandHandler>(), cmd, token)));
     }
 
     /// <summary>

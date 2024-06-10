@@ -72,6 +72,38 @@ public class SimpleSqlServerPoc : FixtureBase
     }
 
     [Test]
+    public async Task CanAppendTextInBackground_AlternativeHandler()
+    {
+        var texts = new ConcurrentQueue<string>();
+
+        var services = new ServiceCollection();
+
+        // normal stuff
+        services.AddLogging(l => l.AddConsole());
+        services.AddSingleton(texts);
+
+        // freakout stuff
+        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
+        services.AddCommandHandler<AlternativeAppendTextOutboxCommandHandler, AppendTextOutboxCommand>((handler, cmd, token) => handler.HandleAsync(cmd, token));
+
+        await using var provider = services.BuildServiceProvider();
+
+        provider.RunBackgroundWorkersAsync(_cancellationTokenSource.Token);
+
+        // pretend something happens somewhere else
+        Task.Run(async () => await AddOutboxCommandAsync(new AppendTextOutboxCommand(Text: "Howdy!")));
+
+        await texts.WaitOrDie(
+            completionExpression: t => t.Count == 1,
+            failExpression: t => t.Count > 1,
+            failureDetailsFunction: () =>
+                $"Text was not appended as expected - expected one single 'Howdy!' to have been appended, but we got this: {string.Join(", ", texts)}"
+        );
+
+        Assert.That(texts, Is.EqualTo(new[] { "Howdy!" }));
+    }
+
+    [Test]
     public async Task CanAppendTextInBackground_UsingScopedOutboxAppender()
     {
         var texts = new ConcurrentQueue<string>();
@@ -156,6 +188,14 @@ public class SimpleSqlServerPoc : FixtureBase
     /// This is a command handler
     /// </summary>
     class AppendTextOutboxCommandHandler(ConcurrentQueue<string> texts) : ICommandHandler<AppendTextOutboxCommand>
+    {
+        public async Task HandleAsync(AppendTextOutboxCommand command, CancellationToken cancellationToken) => texts.Enqueue(command.Text);
+    }
+
+    /// <summary>
+    /// This is an interfaceless command handler
+    /// </summary>
+    class AlternativeAppendTextOutboxCommandHandler(ConcurrentQueue<string> texts)
     {
         public async Task HandleAsync(AppendTextOutboxCommand command, CancellationToken cancellationToken) => texts.Enqueue(command.Text);
     }
