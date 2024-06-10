@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Freakout.Internals;
+using Freakout.Internals.Dispatchers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -45,7 +46,7 @@ public static class FreakoutServiceCollectionExtensions
 
         services.AddSingleton(configuration.CommandSerializer);
 
-        services.TryAddSingleton<ICommandDispatcher, DefaultCommandDispatcher>();
+        services.TryAddSingleton<ICommandDispatcher, IlEmitCommandDispatcher>();
         
         services.TryAddSingleton<IBatchDispatcher>(p => new DefaultBatchDispatcher(
             commandDispatcher: p.GetRequiredService<ICommandDispatcher>(),

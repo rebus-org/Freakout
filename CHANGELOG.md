@@ -60,3 +60,10 @@
 ## 0.0.21
 * Factor batch dispatch out into separate service to enable plugging in other batch dispatch strategies
 * Make options for individually marking commands as succeeded/failed more sophisticated
+
+## 0.0.22
+* Add IL emit-based command dispatcher and make it the new default - thanks [Danielovich]
+
+
+
+[Danielovich]: https://github.com/Danielovich

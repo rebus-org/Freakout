@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
 using Freakout.Internals;
+using Freakout.Internals.Dispatchers;
 using Freakout.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -14,7 +15,7 @@ using Testy;
 namespace Freakout.Tests.Dispatch;
 
 [TestFixture]
-public class TestDefaultCommandDispatcher : FixtureBase
+public class TestCommandDispatcher : FixtureBase
 {
     SystemTextJsonCommandSerializer _serializer;
 
@@ -32,7 +33,7 @@ public class TestDefaultCommandDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new CompiledExpressionCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(() => dispatcher.ExecuteAsync(GetOutboxCommand(new SomeCommand())));
 
@@ -51,7 +52,7 @@ public class TestDefaultCommandDispatcher : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var dispatcher = new CompiledExpressionCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
 
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej")));
         await dispatcher.ExecuteAsync(GetOutboxCommand(new AnotherCommand("hej med dig")));
@@ -118,10 +119,14 @@ SCOPE 'Dispatch 10000000 commands' completed in 22555,6927 ms | 0,00225556927 ms
        
      *
      */
-    [TestCase(1000)]
-    [TestCase(1000000, Explicit = true)]
-    [TestCase(10000000, Explicit = true)]
-    public async Task TakeTime(int count)
+    [TestCase(1000, CommandDispatcherImplementation.CompiledExpression)]
+    [TestCase(1000000, CommandDispatcherImplementation.CompiledExpression, Explicit = true)]
+    [TestCase(10000000, CommandDispatcherImplementation.CompiledExpression, Explicit = true)]
+    [TestCase(1000, CommandDispatcherImplementation.IlEmit)]
+    [TestCase(1000000, CommandDispatcherImplementation.IlEmit, Explicit = true)]
+    [TestCase(10000000, CommandDispatcherImplementation.IlEmit, Explicit = true)]
+    [Repeat(5)]
+    public async Task TakeTime(int count, CommandDispatcherImplementation impl)
     {
         var services = new ServiceCollection();
 
@@ -129,7 +134,22 @@ SCOPE 'Dispatch 10000000 commands' completed in 22555,6927 ms | 0,00225556927 ms
 
         await using var provider = services.BuildServiceProvider();
 
-        var dispatcher = new DefaultCommandDispatcher(_serializer, provider.GetRequiredService<IServiceScopeFactory>());
+        var serviceScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+
+        var dispatcher = impl switch
+        {
+            CommandDispatcherImplementation.CompiledExpression => (ICommandDispatcher)new CompiledExpressionCommandDispatcher(
+                commandSerializer: _serializer,
+                serviceScopeFactory: serviceScopeFactory
+            ),
+
+            CommandDispatcherImplementation.IlEmit => new IlEmitCommandDispatcher(
+                commandSerializer: _serializer,
+                serviceScopeFactory: serviceScopeFactory
+            ),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(impl), impl, "Unknown command dispatcher implementation")
+        };
 
         using var _ = TimerScope($"Dispatch {count} commands", count);
 
@@ -140,6 +160,12 @@ SCOPE 'Dispatch 10000000 commands' completed in 22555,6927 ms | 0,00225556927 ms
 
             await dispatcher.ExecuteAsync(outboxCommand, CancellationToken.None);
         }
+    }
+
+    public enum CommandDispatcherImplementation
+    {
+        CompiledExpression,
+        IlEmit
     }
 
     OutboxCommand GetOutboxCommand(object command) => _serializer.Serialize(command);
