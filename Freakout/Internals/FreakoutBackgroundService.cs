@@ -45,6 +45,11 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispa
 
                     await batch.CompleteAsync(stoppingToken);
                 }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    // don't catch this
+                    throw;
+                }
                 catch (Exception exception)
                 {
                     logger.LogError(exception, "Error when executing store commands");
