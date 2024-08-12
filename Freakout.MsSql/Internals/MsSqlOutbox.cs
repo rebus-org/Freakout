@@ -10,7 +10,7 @@ namespace Freakout.MsSql.Internals;
 /// <summary>
 /// This one should probably be changed into one that does not manage its own connection/transaction
 /// </summary>
-class MsSqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
+class MsSqlOutbox(MsSqlFreakoutConfiguration configuration, IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 {
     public void AddOutboxCommand(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
@@ -18,7 +18,14 @@ class MsSqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
         
         var context = freakoutContextAccessor.GetContext<MsSqlFreakoutContext>();
         var transaction = context.Transaction;
-        transaction.AddOutboxCommand(command, headers);
+
+        transaction.AddOutboxCommand(
+            serializer: configuration.CommandSerializer,
+            schemaName: configuration.SchemaName,
+            tableName: configuration.TableName,
+            command: command,
+            headers: headers
+        );
     }
 
     public async Task AddOutboxCommandAsync(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
@@ -27,6 +34,14 @@ class MsSqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 
         var context = freakoutContextAccessor.GetContext<MsSqlFreakoutContext>();
         var transaction = context.Transaction;
-        await transaction.AddOutboxCommandAsync(command, headers, cancellationToken);
+
+        await transaction.AddOutboxCommandAsync(
+            serializer: configuration.CommandSerializer,
+            schemaName: configuration.SchemaName,
+            tableName: configuration.TableName,
+            command: command,
+            headers: headers,
+            cancellationToken: cancellationToken
+        );
     }
 }

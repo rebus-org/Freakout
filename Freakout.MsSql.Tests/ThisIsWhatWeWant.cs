@@ -26,9 +26,11 @@ public class ThisIsWhatWeWant : FixtureBase
     [Test]
     public async Task MakeItLookPrettyLikeThis()
     {
+        var configuration = new MsSqlFreakoutConfiguration(_connectionString);
+
         // and a modern .NET app
         var services = new ServiceCollection();
-        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString));
+        services.AddFreakout(configuration);
         services.AddCommandHandler<PrintTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
@@ -37,18 +39,18 @@ public class ThisIsWhatWeWant : FixtureBase
         _ = provider.RunBackgroundWorkersAsync(cancellationTokenSource.Token);
 
         // in our app we sometimes execute SQL stuff like this
-        await AddOutboxCommandAsync(new PrintTextOutboxCommand(Text: "Howdy!"));
+        await AddOutboxCommandAsync(configuration, new PrintTextOutboxCommand(Text: "Howdy!"));
 
         await cancellationTokenSource.CancelAsync();
     }
 
-    async Task AddOutboxCommandAsync(object command)
+    async Task AddOutboxCommandAsync(MsSqlFreakoutConfiguration configuration, object command)
     {
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
 
         await using var transaction = await connection.BeginTransactionAsync();
-        await transaction.AddOutboxCommandAsync(command);
+        await transaction.AddOutboxCommandAsync(configuration.CommandSerializer, configuration.SchemaName, configuration.TableName, command);
         await transaction.CommitAsync();
     }
 

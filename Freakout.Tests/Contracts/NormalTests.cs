@@ -33,25 +33,6 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
     public void CanStartUpAndShutDown() => _ = _factory.Create();
 
     [Test]
-    [Description("To provide the best experience, Freakout registers a couple of global objects. We want to be pretty sure that they're there when the system runs, and that they're gone when it's stopped again.")]
-    public void CanStartUpAndShutDown_CheckGlobals()
-    {
-        var globalsBefore = Globals.GetAll();
-
-        _ = _factory.Create();
-
-        var detectedPresenceOfConfiguration = Globals.Get<FreakoutConfiguration>() != null;
-
-        _factory.Dispose();
-
-        var globalsAfterShutdown = Globals.GetAll();
-
-        Assert.That(globalsBefore.Length, Is.EqualTo(0), "Expected 0 globals when we haven't started the system");
-        Assert.That(globalsAfterShutdown.Length, Is.EqualTo(0), "Expected 0 globals after shutting down the system");
-        Assert.That(detectedPresenceOfConfiguration, Is.True, "Did not find a global FreakoutConfiguration object");
-    }
-
-    [Test]
     public async Task CanSendAndReceiveSingleCommand()
     {
         var system = _factory.Create();

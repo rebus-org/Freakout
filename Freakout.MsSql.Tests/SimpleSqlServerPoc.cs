@@ -28,8 +28,6 @@ public class SimpleSqlServerPoc : FixtureBase
 
         base.SetUp();
 
-        Using(new GlobalsCleaner());
-
         _connectionString = MsSqlTestHelper.ConnectionString;
 
         MsSqlTestHelper.DropTable("OutboxCommands");
@@ -51,7 +49,8 @@ public class SimpleSqlServerPoc : FixtureBase
         services.AddSingleton(texts);
 
         // freakout stuff
-        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
+        var configuration = new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) };
+        services.AddFreakout(configuration);
         services.AddCommandHandler<AppendTextOutboxCommandHandler>();
 
         await using var provider = services.BuildServiceProvider();
@@ -59,7 +58,7 @@ public class SimpleSqlServerPoc : FixtureBase
         provider.RunBackgroundWorkersAsync(_cancellationTokenSource.Token);
 
         // pretend something happens somewhere else
-        Task.Run(async () => await AddOutboxCommandAsync(new AppendTextOutboxCommand(Text: "Howdy!")));
+        Task.Run(async () => await AddOutboxCommandAsync(configuration, new AppendTextOutboxCommand(Text: "Howdy!")));
 
         await texts.WaitOrDie(
             completionExpression: t => t.Count == 1,
@@ -83,7 +82,8 @@ public class SimpleSqlServerPoc : FixtureBase
         services.AddSingleton(texts);
 
         // freakout stuff
-        services.AddFreakout(new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) });
+        var configuration = new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) };
+        services.AddFreakout(configuration);
         services.AddCommandHandler<AlternativeAppendTextOutboxCommandHandler, AppendTextOutboxCommand>((handler, cmd, token) => handler.HandleAsync(cmd, token));
 
         await using var provider = services.BuildServiceProvider();
@@ -91,7 +91,7 @@ public class SimpleSqlServerPoc : FixtureBase
         provider.RunBackgroundWorkersAsync(_cancellationTokenSource.Token);
 
         // pretend something happens somewhere else
-        Task.Run(async () => await AddOutboxCommandAsync(new AppendTextOutboxCommand(Text: "Howdy!")));
+        Task.Run(async () => await AddOutboxCommandAsync(configuration, new AppendTextOutboxCommand(Text: "Howdy!")));
 
         await texts.WaitOrDie(
             completionExpression: t => t.Count == 1,
@@ -169,13 +169,13 @@ public class SimpleSqlServerPoc : FixtureBase
         await transaction.CommitAsync();
     }
 
-    async Task AddOutboxCommandAsync(object command)
+    async Task AddOutboxCommandAsync(MsSqlFreakoutConfiguration configuration, object command)
     {
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
 
         await using var transaction = await connection.BeginTransactionAsync();
-        await transaction.AddOutboxCommandAsync(command);
+        await transaction.AddOutboxCommandAsync(configuration.CommandSerializer, configuration.SchemaName, configuration.TableName, command);
         await transaction.CommitAsync();
     }
 

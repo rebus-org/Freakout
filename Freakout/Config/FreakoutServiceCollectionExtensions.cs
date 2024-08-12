@@ -6,7 +6,6 @@ using Freakout.Internals;
 using Freakout.Internals.Dispatchers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
 // ReSharper disable SimplifyLinqExpressionUseAll
 
 namespace Freakout.Config;
@@ -24,19 +23,10 @@ public static class FreakoutServiceCollectionExtensions
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        if (Globals.Get<FreakoutConfiguration>() != null)
-        {
-            throw new InvalidOperationException(
-                $"Found global FreakoutConfiguration {Globals.Get<FreakoutConfiguration>()} - unfortunately, it's not possible to run two Freakout instances in the same process at the same time");
-        }
-
         services.AddSingleton(configuration);
 
         services.AddHostedService(p =>
         {
-            // HACK: Resolve the globals cleaner to make the container own it and therefore dispose it
-            _ = p.GetRequiredService<GlobalsClearer>();
-
             var freakoutBackgroundService = new FreakoutBackgroundService(
                 configuration: configuration,
                 dispatcher: p.GetRequiredService<IBatchDispatcher>(),
@@ -71,11 +61,6 @@ public static class FreakoutServiceCollectionExtensions
         }
 
         services.TryAddSingleton<IFreakoutContextAccessor, AsyncLocalFreakoutContextAccessor>();
-
-        // this is special and a monster hack: Stuff the configuration in the globals!
-        Globals.Set(configuration);
-
-        services.AddSingleton(_ => new GlobalsClearer());
     }
 
     /// <summary>

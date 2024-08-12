@@ -39,6 +39,6 @@ public class MsSqlFreakoutConfiguration(string connectionString) : FreakoutConfi
             return commandStore;
         });
 
-        services.AddScoped<IOutbox, MsSqlOutbox>();
+        services.AddScoped<IOutbox>(p => new MsSqlOutbox(this, p.GetRequiredService<IFreakoutContextAccessor>()));
     }
 }

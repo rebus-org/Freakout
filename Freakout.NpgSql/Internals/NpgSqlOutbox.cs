@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Freakout.NpgSql.Internals;
 
-class NpgsqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
+class NpgsqlOutbox(NpgsqlFreakoutConfiguration configuration, IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 {
     public void AddOutboxCommand(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
@@ -15,7 +15,14 @@ class NpgsqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 
         var context = freakoutContextAccessor.GetContext<NpgsqlFreakoutContext>();
         var transaction = context.Transaction;
-        transaction.AddOutboxCommand(command, headers);
+
+        transaction.AddOutboxCommand(
+            schemaName: configuration.SchemaName,
+            tableName: configuration.TableName,
+            serializer: configuration.CommandSerializer,
+            command: command,
+            headers: headers
+        );
     }
 
     public async Task AddOutboxCommandAsync(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
@@ -24,6 +31,14 @@ class NpgsqlOutbox(IFreakoutContextAccessor freakoutContextAccessor) : IOutbox
 
         var context = freakoutContextAccessor.GetContext<NpgsqlFreakoutContext>();
         var transaction = context.Transaction;
-        await transaction.AddOutboxCommandAsync(command, headers, cancellationToken: cancellationToken);
+
+        await transaction.AddOutboxCommandAsync(
+            schemaName: configuration.SchemaName,
+            tableName: configuration.TableName,
+            serializer: configuration.CommandSerializer,
+            command: command,
+            headers: headers,
+            cancellationToken: cancellationToken
+        );
     }
 }
