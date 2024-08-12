@@ -39,16 +39,16 @@ public class InMemFreakoutConfiguration : FreakoutConfiguration
 
         if (CheckSerialization)
         {
-            services.AddSingleton<IOutbox>(_ => new InMemOutboxDecorator(CommandSerializer, CreateInMemOutbox()));
+            services.AddScoped<IOutbox>(p => new InMemOutboxDecorator(CommandSerializer, CreateInMemOutbox(p.GetRequiredService<IFreakoutContextAccessor>())));
         }
         else
         {
-            services.AddSingleton<IOutbox>(_ => CreateInMemOutbox());
+            services.AddScoped<IOutbox>(p => CreateInMemOutbox(p.GetRequiredService<IFreakoutContextAccessor>()));
         }
 
-        InMemOutbox CreateInMemOutbox()
+        InMemOutbox CreateInMemOutbox(IFreakoutContextAccessor fremFreakoutContextAccessor)
         {
-            var inMemOutbox = new InMemOutbox(Commands);
+            var inMemOutbox = new InMemOutbox(fremFreakoutContextAccessor, Commands);
             inMemOutbox.CommandAddedToQueue += cmd => CommandAdded?.Invoke(cmd);
             return inMemOutbox;
         }

@@ -27,10 +27,28 @@ public readonly struct FreakoutContextScope : IDisposable
     /// <summary>
     /// Creates the scope and establishes <paramref name="context"/> as the current ambient Freakout context. Any existing context will be remembered and restored when the scope is disposed.
     /// </summary>
-    public FreakoutContextScope(IFreakoutContext context) => AsyncLocalFreakoutContextAccessor.Instance.Value = context ?? throw new ArgumentNullException(nameof(context));
+    public FreakoutContextScope(IFreakoutContext context)
+    {
+        AsyncLocalFreakoutContextAccessor.Instance.Value = context ?? throw new ArgumentNullException(nameof(context));
+
+        if (context is IContextHooks contextHooks)
+        {
+            contextHooks.Mounted();
+        }
+    }
 
     /// <summary>
     /// Removes the ambient context again and restores the previous scope.
     /// </summary>
-    public void Dispose() => AsyncLocalFreakoutContextAccessor.Instance.Value = _previous;
+    public void Dispose()
+    {
+        var context = AsyncLocalFreakoutContextAccessor.Instance.Value;
+
+        AsyncLocalFreakoutContextAccessor.Instance.Value = _previous;
+
+        if (context is IContextHooks contextHooks)
+        {
+            contextHooks.Unmounted();
+        }
+    }
 }

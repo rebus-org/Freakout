@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Freakout.Testing.Internals;
 
-class InMemOutbox(ConcurrentQueue<InMemOutboxCommand> outboxCommands) : IOutbox
+class InMemOutbox(IFreakoutContextAccessor freakoutContextAccessor, ConcurrentQueue<InMemOutboxCommand> commands) : IOutbox
 {
     public event Action<InMemOutboxCommand> CommandAddedToQueue;
 
@@ -23,8 +23,18 @@ class InMemOutbox(ConcurrentQueue<InMemOutboxCommand> outboxCommands) : IOutbox
 
     void Enqueue(object command, Dictionary<string, string> headers)
     {
+        var context = freakoutContextAccessor.GetContext<InMemFreakoutContext>();
         var inMemOutboxCommand = new InMemOutboxCommand(headers ?? new(), command);
-        outboxCommands.Enqueue(inMemOutboxCommand);
-        CommandAddedToQueue?.Invoke(inMemOutboxCommand);
+
+        context.UnmountedCallback ??= enlistedCommands =>
+        {
+            foreach (var cmd in enlistedCommands)
+            {
+                commands.Enqueue(cmd);
+                CommandAddedToQueue?.Invoke(cmd);
+            }
+        };
+
+        context.Enlist(inMemOutboxCommand);
     }
 }
