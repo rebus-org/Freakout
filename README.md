@@ -57,36 +57,9 @@ Now it's fully configured - what's missing is putting something in the outbox.
 
 ## Two ways of adding commands to the outbox
 
-### First way: Directly on the database transaction
+### First way: By using `IOutbox`
 
-Since this example is for SQL Server, and we're pretending to be working with `Microsoft.Data.SqlClient` and `SqlConnection`, it's natural to
-provide the outbox functionality as an extension method to `DbTransaction`. This way, your code can do stuff like this:
-
-```csharp
-await using var connection = new SqlConnection(_connectionString);
-await connection.OpenAsync();
-
-await using var transaction = await connection.BeginTransactionAsync();
-
-// do your own work with connection+transaction here
-// (...)
-
-// possibly call this bad boy a couple of times
-await transaction.AddOutboxCommandAsync(new PublishJournalEntryAddedCommand(Id: journalEntryId));
-
-// do more of your own work
-// (...)
-
-// commit it all atomically
-await transaction.CommitAsync();
-```
-
-which in this case would result in publishing a couple of `JournalEntryAdded` events using Rebus.
-
-
-### Second way: By using `IOutbox`
-
-This is a neat way to do it: You can manage your unit of work with your `SqlConnection` and `SqlTransaction` somewhere
+This is the neat way to do it: You can manage your unit of work with your `SqlConnection` and `SqlTransaction` somewhere
 and then make them available to Freakout by using a `FreakoutContextScope` like this:
 
 ```csharp
@@ -130,6 +103,35 @@ await outbox.AddOutboxCommandAsync(command);
 ```
 
 without having to bother with thinking about which type of persistence is being used.
+
+
+### Second way: Directly on the database transaction
+
+This way is more involved, because it's closer to the metal.
+
+Since this example is for SQL Server, and we're pretending to be working with `Microsoft.Data.SqlClient` and `SqlConnection`, it's natural to
+provide the outbox functionality as an extension method to `DbTransaction`. This way, your code can do stuff like this:
+
+```csharp
+await using var connection = new SqlConnection(_connectionString);
+await connection.OpenAsync();
+
+await using var transaction = await connection.BeginTransactionAsync();
+
+// do your own work with connection+transaction here
+// (...)
+
+// possibly call this bad boy a couple of times
+await transaction.AddOutboxCommandAsync(serializer, "dbo", "OutboxCommands", new PublishJournalEntryAddedCommand(Id: journalEntryId));
+
+// do more of your own work
+// (...)
+
+// commit it all atomically
+await transaction.CommitAsync();
+```
+
+which in this case would result in publishing a couple of `JournalEntryAdded` events using Rebus.
 
 
 ## What does a command handler look like?
