@@ -70,4 +70,9 @@
 ## 0.0.24
 * Add support for interfaceless command handlers
 
+## 0.0.30
+* Remove need for globals
+
+
+
 [Danielovich]: https://github.com/Danielovich
