@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Freakout.Testing\Freakout.Testing.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="microsoft.net.test.sdk" Version="17.10.0" />
+		<PackageReference Include="nunit" Version="4.1.0" />
+		<PackageReference Include="testy" Version="0.9.0" />
+		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="8.0.0" />
+	</ItemGroup>
+
+</Project>
