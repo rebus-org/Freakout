@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,13 +9,22 @@ namespace Freakout.Testing.Internals;
 
 class InMemOutbox(ConcurrentQueue<InMemOutboxCommand> outboxCommands) : IOutbox
 {
+    public event Action<InMemOutboxCommand> CommandAddedToQueue;
+
     public void AddOutboxCommand(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
-        outboxCommands.Enqueue(new(headers ?? new(), command));
+        Enqueue(command, headers);
     }
 
     public async Task AddOutboxCommandAsync(object command, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
     {
-        outboxCommands.Enqueue(new(headers ?? new(), command));
+        Enqueue(command, headers);
+    }
+
+    void Enqueue(object command, Dictionary<string, string> headers)
+    {
+        var inMemOutboxCommand = new InMemOutboxCommand(headers ?? new(), command);
+        outboxCommands.Enqueue(inMemOutboxCommand);
+        CommandAddedToQueue?.Invoke(inMemOutboxCommand);
     }
 }

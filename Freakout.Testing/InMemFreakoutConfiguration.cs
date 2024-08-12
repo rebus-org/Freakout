@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Freakout.Testing.Internals;
 using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable RedundantTypeArgumentsOfMethod
@@ -25,6 +26,11 @@ public class InMemFreakoutConfiguration : FreakoutConfiguration
     /// </summary>
     public ConcurrentQueue<InMemOutboxCommand> Commands { get; } = new();
 
+    /// <summary>
+    /// Raised when a command is enqueued.
+    /// </summary>
+    public event Action<InMemOutboxCommand> CommandAdded;
+
     /// <inheritdoc />
     protected override void ConfigureServices(IServiceCollection services)
     {
@@ -33,11 +39,18 @@ public class InMemFreakoutConfiguration : FreakoutConfiguration
 
         if (CheckSerialization)
         {
-            services.AddSingleton<IOutbox>(_ => new InMemOutboxDecorator(CommandSerializer, new InMemOutbox(Commands)));
+            services.AddSingleton<IOutbox>(_ => new InMemOutboxDecorator(CommandSerializer, CreateInMemOutbox()));
         }
         else
         {
-            services.AddSingleton<IOutbox>(_ => new InMemOutbox(Commands));
+            services.AddSingleton<IOutbox>(_ => CreateInMemOutbox());
+        }
+
+        InMemOutbox CreateInMemOutbox()
+        {
+            var inMemOutbox = new InMemOutbox(Commands);
+            inMemOutbox.CommandAddedToQueue += cmd => CommandAdded?.Invoke(cmd);
+            return inMemOutbox;
         }
     }
 }
