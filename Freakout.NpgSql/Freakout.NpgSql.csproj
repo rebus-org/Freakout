@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<LangVersion>13</LangVersion>
 		<Authors>mookid8000</Authors>
 		<Company>Rebus FM ApS</Company>
@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="npgsql" Version="8.0.3" />
+		<PackageReference Include="npgsql" Version="9.0.1" />
 		<PackageReference Include="sequentialguid" Version="4.0.5" />
 	</ItemGroup>
 

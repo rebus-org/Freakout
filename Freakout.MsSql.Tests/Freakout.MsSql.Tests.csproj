@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.data.sqlclient" Version="5.2.0" />
+		<PackageReference Include="microsoft.data.sqlclient" Version="5.2.2" />
 		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="8.0.0" />
 		<PackageReference Include="microsoft.extensions.hosting" Version="8.0.0" />
 		<PackageReference Include="microsoft.extensions.logging" Version="8.0.0" />
