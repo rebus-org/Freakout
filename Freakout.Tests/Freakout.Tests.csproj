@@ -10,7 +10,7 @@
 		<PackageReference Include="microsoft.extensions.logging" Version="8.0.0" />
 		<PackageReference Include="microsoft.net.test.sdk" Version="17.12.0" />
 		<PackageReference Include="nito.asyncex" Version="5.1.2" />
-		<PackageReference Include="nunit" Version="4.1.0" />
+		<PackageReference Include="nunit" Version="4.2.2" />
 		<PackageReference Include="nunit3testadapter" Version="4.5.0" />
 		<PackageReference Include="polly" Version="8.4.0" />
 		<PackageReference Include="scrutor" Version="4.2.2" />

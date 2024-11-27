@@ -11,7 +11,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="microsoft.net.test.sdk" Version="17.12.0" />
-		<PackageReference Include="nunit" Version="4.1.0" />
+		<PackageReference Include="nunit" Version="4.2.2" />
 		<PackageReference Include="testy" Version="0.9.0" />
 		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="8.0.0" />
 	</ItemGroup>
