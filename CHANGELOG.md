@@ -73,6 +73,8 @@
 ## 0.0.30
 * Remove need for globals
 
+## 0.0.31
+* Fix tests and update some packages
 
 
 [Danielovich]: https://github.com/Danielovich

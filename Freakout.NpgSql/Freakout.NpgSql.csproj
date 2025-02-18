@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="npgsql" Version="9.0.1" />
+		<PackageReference Include="npgsql" Version="9.0.2" />
 		<PackageReference Include="sequentialguid" Version="4.0.5" />
 	</ItemGroup>
 

@@ -25,7 +25,10 @@ public class CheckHowItLooks : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new MyCommand("hello there 🙂"));
+        using (new FreakoutContextScope(new InMemFreakoutContext()))
+        {
+            await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new MyCommand("hello there 🙂"));
+        }
 
         await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(1));
     }
@@ -42,7 +45,10 @@ public class CheckHowItLooks : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new MyCommand("hello there 🙂"));
+        using (new FreakoutContextScope(new InMemFreakoutContext()))
+        {
+            await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new MyCommand("hello there 🙂"));
+        }
 
         Assert.That(commands.Count, Is.EqualTo(1));
 
@@ -61,6 +67,8 @@ public class CheckHowItLooks : FixtureBase
         services.AddFreakout(new InMemFreakoutConfiguration());
 
         await using var provider = services.BuildServiceProvider();
+
+        using var _ = new FreakoutContextScope(new InMemFreakoutContext());
 
         var exception = Assert.ThrowsAsync<SerializationException>(() =>
             provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new CannotBeRoundtripped(123)));
@@ -82,7 +90,10 @@ public class CheckHowItLooks : FixtureBase
 
         await using var provider = services.BuildServiceProvider();
 
-        await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new CannotBeRoundtripped(123));
+        using (new FreakoutContextScope(new InMemFreakoutContext()))
+        {
+            await provider.GetRequiredService<IOutbox>().AddOutboxCommandAsync(new CannotBeRoundtripped(123));
+        }
     }
 
     class CannotBeRoundtripped(int wrongType)
