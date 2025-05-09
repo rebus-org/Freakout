@@ -6,5 +6,5 @@ namespace Freakout.Testing.Internals;
 
 class InMemOutboxCommandStore : IOutboxCommandStore
 {
-    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(int commandProcessingBatchSize = 1, CancellationToken cancellationToken = default) => OutboxCommandBatch.Empty;
+    public async Task<OutboxCommandBatch> GetPendingOutboxCommandsAsync(int commandProcessingBatchSize, CancellationToken cancellationToken = default) => OutboxCommandBatch.Empty;
 }

@@ -76,5 +76,9 @@
 ## 0.0.31
 * Fix tests and update some packages
 
+## 0.0.32
+* Remove misleading parameter default
+* Update the deps
+
 
 [Danielovich]: https://github.com/Danielovich

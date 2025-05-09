@@ -45,7 +45,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
             scope.Complete();
         }
 
-        using var batch = await commandStore.GetPendingOutboxCommandsAsync();
+        using var batch = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
 
         Assert.That(batch.Count(), Is.EqualTo(1),
             "The command store must return a batch containing exactly 1 command at this point, because one single command has been added");
@@ -70,13 +70,13 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
             scope.Complete();
         }
 
-        using var batch1 = await commandStore.GetPendingOutboxCommandsAsync();
+        using var batch1 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
         await batch1.CompleteAsync();
 
-        using var batch2 = await commandStore.GetPendingOutboxCommandsAsync();
+        using var batch2 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
         await batch2.CompleteAsync();
 
-        using var batch3 = await commandStore.GetPendingOutboxCommandsAsync();
+        using var batch3 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
         await batch3.CompleteAsync();
 
         Assert.That(batch1.Count(), Is.EqualTo(1), "Expected batch to contain 1 command (because processing batch size = 1 and we added 2 commands)");
@@ -98,9 +98,9 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
             scope.Complete();
         }
 
-        using var batch1 = await commandStore.GetPendingOutboxCommandsAsync();
-        using var batch2 = await commandStore.GetPendingOutboxCommandsAsync();
-        using var batch3 = await commandStore.GetPendingOutboxCommandsAsync();
+        using var batch1 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
+        using var batch2 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
+        using var batch3 = await commandStore.GetPendingOutboxCommandsAsync(commandProcessingBatchSize: 1);
 
         await batch3.CompleteAsync();
         await batch2.CompleteAsync();

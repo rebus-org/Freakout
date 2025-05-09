@@ -30,8 +30,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="npgsql" Version="9.0.3" />
 		<PackageReference Include="sequentialguid" Version="4.0.6" />
+		<PackageReference Include="marten" Version="7.40.1" />
 	</ItemGroup>
 
 </Project>

@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout.Testing", "Freakou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout.Testing.Tests", "Freakout.Testing.Tests\Freakout.Testing.Tests.csproj", "{6CC84A87-40A1-4DE4-9D03-D06D026F6834}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freakout.Marten", "Freakout.Marten\Freakout.Marten.csproj", "{E2431672-4643-464C-83A1-AD651801DFAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{6CC84A87-40A1-4DE4-9D03-D06D026F6834}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CC84A87-40A1-4DE4-9D03-D06D026F6834}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CC84A87-40A1-4DE4-9D03-D06D026F6834}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2431672-4643-464C-83A1-AD651801DFAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2431672-4643-464C-83A1-AD651801DFAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2431672-4643-464C-83A1-AD651801DFAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2431672-4643-464C-83A1-AD651801DFAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{AF67CBB0-753B-4305-9811-B6AEB63B07AF} = {73164D95-FB6C-4389-B86D-38DB4F55A0B9}
 		{BE073F72-0AE8-4A1F-9F0D-4EBBB4200C1B} = {AF67CBB0-753B-4305-9811-B6AEB63B07AF}
 		{6CC84A87-40A1-4DE4-9D03-D06D026F6834} = {AF67CBB0-753B-4305-9811-B6AEB63B07AF}
+		{E2431672-4643-464C-83A1-AD651801DFAD} = {D391FDEC-F778-4755-BA2E-C36A5E0DD79B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {764C61BA-C31B-4E87-BBAF-DCD4EF573CD9}

@@ -16,7 +16,7 @@
 		<PackageReference Include="microsoft.extensions.logging" Version="8.0.0" />
 		<PackageReference Include="microsoft.net.test.sdk" Version="17.13.0" />
 		<PackageReference Include="nunit3testadapter" Version="5.0.0" />
-		<PackageReference Include="Testcontainers.PostgreSql" Version="4.2.0" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
 	</ItemGroup>
 
 </Project>

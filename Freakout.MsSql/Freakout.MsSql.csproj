@@ -26,8 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.data.sqlclient" Version="6.0.1" />
-		<PackageReference Include="sequentialguid" Version="4.0.5" />
+		<PackageReference Include="microsoft.data.sqlclient" Version="6.0.2" />
+		<PackageReference Include="sequentialguid" Version="4.0.6" />
 	</ItemGroup>
 
 	<ItemGroup>
