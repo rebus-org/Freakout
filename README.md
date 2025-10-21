@@ -20,7 +20,7 @@ OR you could simply store information about which actions to perform in (2) as p
 
 ## Until now, I have only seen outboxes built into messaging libraries - why now a separate library?
 
-Why? Because "outbox" is closer to your chosen type of persistence (SQL Server, Postgres, etc.) than to anything else.
+Why? Because the "outbox" is closer to your chosen type of persistence (SQL Server, Postgres, etc.) than to anything else, and it can do much more than sending messages.
 
 
 ## Which types of persistence does it support?
