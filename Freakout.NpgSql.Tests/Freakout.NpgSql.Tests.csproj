@@ -11,12 +11,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="8.0.0" />
-		<PackageReference Include="microsoft.extensions.hosting" Version="8.0.0" />
-		<PackageReference Include="microsoft.extensions.logging" Version="8.0.0" />
-		<PackageReference Include="microsoft.net.test.sdk" Version="17.13.0" />
-		<PackageReference Include="nunit3testadapter" Version="5.0.0" />
-		<PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="10.0.2" />
+		<PackageReference Include="microsoft.extensions.hosting" Version="10.0.2" />
+		<PackageReference Include="microsoft.extensions.logging" Version="10.0.2" />
+		<PackageReference Include="microsoft.net.test.sdk" Version="18.0.1" />
+		<PackageReference Include="nunit3testadapter" Version="6.1.0" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="4.10.0" />
 	</ItemGroup>
 
 </Project>

@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.data.sqlclient" Version="6.0.2" />
+		<PackageReference Include="microsoft.data.sqlclient" Version="6.1.4" />
 		<PackageReference Include="sequentialguid" Version="4.0.6" />
 	</ItemGroup>
 

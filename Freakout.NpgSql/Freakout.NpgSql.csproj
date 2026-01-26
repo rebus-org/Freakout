@@ -27,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="npgsql" Version="9.0.3" />
+		<PackageReference Include="npgsql" Version="10.0.1" />
 		<PackageReference Include="sequentialguid" Version="4.0.6" />
 	</ItemGroup>
 

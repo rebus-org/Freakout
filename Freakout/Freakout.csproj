@@ -28,8 +28,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="3.1.0" />
-		<PackageReference Include="microsoft.extensions.hosting" Version="3.1.0" />
+		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="10.0.2" />
+		<PackageReference Include="microsoft.extensions.hosting" Version="10.0.2" />
 		<PackageReference Include="nito.asyncex" Version="5.1.2" />
 	</ItemGroup>
 
