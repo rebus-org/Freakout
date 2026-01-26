@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,7 +67,7 @@ public static class FreakoutServiceCollectionExtensions
     /// <summary>
     /// Adds the type <typeparamref name="TCommandHandler"/> as a Freakout command handler, using the invoker function <paramref name="invoker"/> to invoke it.
     /// </summary>
-    public static void AddCommandHandler<TCommandHandler, TCommand>(this IServiceCollection services, Func<TCommandHandler, TCommand, CancellationToken, Task> invoker) where TCommandHandler : class
+    public static void AddCommandHandler<TCommandHandler, TCommand>(this IServiceCollection services, Func<TCommandHandler, TCommand, IDictionary<string, string>, CancellationToken, Task> invoker) where TCommandHandler : class
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (invoker == null) throw new ArgumentNullException(nameof(invoker));
@@ -74,7 +75,7 @@ public static class FreakoutServiceCollectionExtensions
         var serviceType = typeof(ICommandHandler<>).MakeGenericType(typeof(TCommand));
 
         services.AddScoped<TCommandHandler>();
-        services.AddScoped(serviceType, p => new DelegatingCommandHandler<TCommand>((cmd, token) => invoker(p.GetRequiredService<TCommandHandler>(), cmd, token)));
+        services.AddScoped(serviceType, p => new DelegatingCommandHandler<TCommand>((cmd, headers, token) => invoker(p.GetRequiredService<TCommandHandler>(), cmd, headers, token)));
     }
 
     /// <summary>

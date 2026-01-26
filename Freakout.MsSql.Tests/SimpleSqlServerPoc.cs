@@ -84,7 +84,7 @@ public class SimpleSqlServerPoc : FixtureBase
         // freakout stuff
         var configuration = new MsSqlFreakoutConfiguration(_connectionString) { OutboxPollInterval = TimeSpan.FromSeconds(1) };
         services.AddFreakout(configuration);
-        services.AddCommandHandler<AlternativeAppendTextOutboxCommandHandler, AppendTextOutboxCommand>((handler, cmd, token) => handler.HandleAsync(cmd, token));
+        services.AddCommandHandler<AlternativeAppendTextOutboxCommandHandler, AppendTextOutboxCommand>((handler, cmd, _, _) => handler.ExecuteAsync(cmd));
 
         await using var provider = services.BuildServiceProvider();
 
@@ -189,7 +189,7 @@ public class SimpleSqlServerPoc : FixtureBase
     /// </summary>
     class AppendTextOutboxCommandHandler(ConcurrentQueue<string> texts) : ICommandHandler<AppendTextOutboxCommand>
     {
-        public async Task HandleAsync(AppendTextOutboxCommand command, CancellationToken cancellationToken) => texts.Enqueue(command.Text);
+        public async Task HandleAsync(AppendTextOutboxCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken) => texts.Enqueue(command.Text);
     }
 
     /// <summary>
@@ -197,6 +197,6 @@ public class SimpleSqlServerPoc : FixtureBase
     /// </summary>
     class AlternativeAppendTextOutboxCommandHandler(ConcurrentQueue<string> texts)
     {
-        public async Task HandleAsync(AppendTextOutboxCommand command, CancellationToken cancellationToken) => texts.Enqueue(command.Text);
+        public async Task ExecuteAsync(AppendTextOutboxCommand command) => texts.Enqueue(command.Text);
     }
 }

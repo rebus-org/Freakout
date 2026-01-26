@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Freakout.Config;
@@ -64,15 +65,15 @@ public abstract class ExtensibilityTests<TFreakoutSystemFactory> : FixtureBase w
 
     class ThrowingCommandHandler(CommandDispatchState state, ManualResetEvent done) : ICommandHandler<string>
     {
-        public async Task HandleAsync(string command, CancellationToken cancellationToken)
+        public async Task HandleAsync(string command, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             state.Count++;
-            
+
             if (state.Count < 4)
             {
                 throw new AccessViolationException($"COUNT WAS {state.Count}");
             }
-            
+
             done.Set();
         }
     }

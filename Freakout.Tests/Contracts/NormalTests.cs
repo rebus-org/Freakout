@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Freakout.Config;
+﻿using Freakout.Config;
 using Freakout.Internals;
 using Microsoft.Extensions.DependencyInjection;
 using Nito.AsyncEx;
 using NUnit.Framework;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Testy;
 using Testy.Extensions;
 using Testy.General;
@@ -159,7 +160,7 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
 
     class SomeKindOfCommandHandler(IFreakoutContextAccessor contextAccessor, ConcurrentQueue<string> events) : ICommandHandler<SomeKindOfCommand>
     {
-        public async Task HandleAsync(SomeKindOfCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(SomeKindOfCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             var context = contextAccessor.GetContext<IFreakoutContext>(throwIfNull: false);
 
@@ -207,14 +208,14 @@ public abstract class NormalTests<TFreakoutSystemFactory> : FixtureBase where TF
 
     class CommandHandler(IOutbox outbox, ConcurrentQueue<string> events, AsyncManualResetEvent done) : ICommandHandler<InitiatingCommand>, ICommandHandler<FinishingCommand>
     {
-        public async Task HandleAsync(InitiatingCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(InitiatingCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             events.Enqueue("Got InitiatingCommand");
             await outbox.AddOutboxCommandAsync(new FinishingCommand(), cancellationToken: cancellationToken);
             events.Enqueue("Sent FinishingCommand");
         }
 
-        public async Task HandleAsync(FinishingCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(FinishingCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             events.Enqueue("Got FinishingCommand");
             events.Enqueue("Signaling done!");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
@@ -12,7 +13,7 @@ class CompiledExpressionCommandDispatcher(ICommandSerializer commandSerializer, 
     /// <summary>
     /// This is how you build an invoker for a generic method using expression trees
     /// </summary>
-    protected override Func<object, CancellationToken, Task> CreateInvoker(Type commandType)
+    protected override Func<object, IDictionary<string, string>, CancellationToken, Task> CreateInvoker(Type commandType)
     {
         const string methodName = nameof(ExecuteOutboxCommandGeneric);
 
@@ -30,16 +31,17 @@ class CompiledExpressionCommandDispatcher(ICommandSerializer commandSerializer, 
 
         // get parameters
         var commandParameter = Expression.Parameter(typeof(object), "command");
+        var headersParameter = Expression.Parameter(typeof(IDictionary<string, string>), "headers");
         var cancellationTokenParameter = Expression.Parameter(typeof(CancellationToken), "cancellationToken");
 
         // and convert the System.Object input to commandType
         var commandConversion = Expression.Convert(commandParameter, commandType);
 
         // build the call
-        var call = Expression.Call(instance, genericMethod, commandConversion, cancellationTokenParameter);
+        var call = Expression.Call(instance, genericMethod, commandConversion, headersParameter, cancellationTokenParameter);
 
         // and wrap it in a lambda with a signature we can use
-        var lambda = Expression.Lambda<Func<object, CancellationToken, Task>>(call, commandParameter, cancellationTokenParameter);
+        var lambda = Expression.Lambda<Func<object, IDictionary<string, string>, CancellationToken, Task>>(call, commandParameter, headersParameter, cancellationTokenParameter);
 
         return lambda.Compile();
     }

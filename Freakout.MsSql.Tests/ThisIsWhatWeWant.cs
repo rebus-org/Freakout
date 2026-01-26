@@ -64,7 +64,7 @@ public class ThisIsWhatWeWant : FixtureBase
     /// </summary>
     class PrintTextOutboxCommandHandler : ICommandHandler<PrintTextOutboxCommand>
     {
-        public async Task HandleAsync(PrintTextOutboxCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(PrintTextOutboxCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             Console.WriteLine(command.Text);
         }

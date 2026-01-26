@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,27 +9,28 @@ namespace Freakout.Internals;
 
 abstract class CommandDispatcher(ICommandSerializer commandSerializer, IServiceScopeFactory serviceScopeFactory) : ICommandDispatcher
 {
-    readonly ConcurrentDictionary<Type, Func<object, CancellationToken, Task>> _invokers = new();
+    readonly ConcurrentDictionary<Type, Func<object, IDictionary<string, string>, CancellationToken, Task>> _invokers = new();
 
     public async Task ExecuteAsync(OutboxCommand outboxCommand, CancellationToken cancellationToken = default)
     {
         var command = commandSerializer.Deserialize(outboxCommand);
+        var headers = outboxCommand.Headers;
         var type = command.GetType();
 
         var invoker = _invokers.GetOrAdd(type, CreateInvoker);
 
-        await invoker(command, cancellationToken);
+        await invoker(command, headers, cancellationToken);
     }
 
-    protected abstract Func<object, CancellationToken, Task> CreateInvoker(Type commandType);
+    protected abstract Func<object, IDictionary<string, string>, CancellationToken, Task> CreateInvoker(Type commandType);
 
-    protected async Task ExecuteOutboxCommandGeneric<TCommand>(TCommand command, CancellationToken cancellationToken)
+    protected async Task ExecuteOutboxCommandGeneric<TCommand>(TCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken)
     {
         using var scope = serviceScopeFactory.CreateScope();
 
         var handler = Resolve(scope.ServiceProvider);
 
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.HandleAsync(command, headers, cancellationToken);
 
         static ICommandHandler<TCommand> Resolve(IServiceProvider serviceProvider)
         {

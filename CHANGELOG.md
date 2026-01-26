@@ -80,5 +80,11 @@
 * Remove misleading parameter default
 * Update the deps
 
+## 0.0.33
+* BREAKING CHANGES
+* Update all the dependencies
+* Extend `HandleAsync` method of `ICommandHandler<TCommand>` to include `IDictionary<string, string> headers`
+
+
 
 [Danielovich]: https://github.com/Danielovich

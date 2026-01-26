@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using Freakout.Config;
+﻿using Freakout.Config;
 using Freakout.Internals.Dispatchers;
 using Freakout.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Testy;
 // ReSharper disable ClassNeverInstantiated.Local
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -173,20 +174,20 @@ SCOPE 'Dispatch 10000000 commands' completed in 22555,6927 ms | 0,00225556927 ms
 
     class SomeCommandHandler : ICommandHandler<SomeCommand>
     {
-        public Task HandleAsync(SomeCommand command, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task HandleAsync(SomeCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     record AnotherCommand(string Text);
 
     class AnotherCommandHandler(ConcurrentQueue<string> events) : ICommandHandler<AnotherCommand>
     {
-        public async Task HandleAsync(AnotherCommand command, CancellationToken cancellationToken) => events.Enqueue($"{GetType().Name} called - text: {command.Text}");
+        public async Task HandleAsync(AnotherCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken) => events.Enqueue($"{GetType().Name} called - text: {command.Text}");
     }
 
     record ThirdCommand(string Text);
 
     class ThirdCommandHandler(ConcurrentQueue<string> events) : ICommandHandler<ThirdCommand>
     {
-        public async Task HandleAsync(ThirdCommand command, CancellationToken cancellationToken) => events.Enqueue($"{GetType().Name} called - text: {command.Text}");
+        public async Task HandleAsync(ThirdCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken) => events.Enqueue($"{GetType().Name} called - text: {command.Text}");
     }
 }

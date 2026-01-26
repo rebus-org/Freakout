@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Freakout;
@@ -6,7 +7,7 @@ namespace Freakout;
 /// <summary>
 /// Freakout command handler marker interface. Used to enable a little bit of nudging via generics.
 /// </summary>
-public interface ICommandHandler { }
+public interface ICommandHandler;
 
 /// <summary>
 /// Freakout command handler interface. Classes that implement this one or more times can be registered
@@ -17,5 +18,5 @@ public interface ICommandHandler<in TCommand> : ICommandHandler
     /// <summary>
     /// Handler method that will be called by Freakout
     /// </summary>
-    Task HandleAsync(TCommand command, CancellationToken cancellationToken);
+    Task HandleAsync(TCommand command, IDictionary<string, string> headers, CancellationToken cancellationToken);
 }
