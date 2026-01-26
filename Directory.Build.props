@@ -1,0 +1,10 @@
+<Project>
+	<PropertyGroup>
+		<FreakoutLibraryTargetFrameworks>netstandard2.0;net462;net8.0;net9.0;net10.0</FreakoutLibraryTargetFrameworks>
+		<LangVersion>14</LangVersion>
+		<Product>Freakout</Product>
+		<Copyright>Copyright © 2026</Copyright>
+		<Authors>mookid8000</Authors>
+		<Company>Rebus FM ApS</Company>
+	</PropertyGroup>
+</Project>

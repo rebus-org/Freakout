@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-		<LangVersion>13</LangVersion>
-		<Authors>mookid8000</Authors>
-		<Company>Rebus FM ApS</Company>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/rebus-org/Freakout</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
