@@ -101,6 +101,8 @@ class NpgsqlOutboxCommandStore(string connectionString, string tableName, string
 
         command.CommandText = $@"
 
+CREATE SCHEMA IF NOT EXISTS ""{schemaName}"";
+
 CREATE TABLE IF NOT EXISTS ""{schemaName}"".""{tableName}"" (
     ""id"" UUID PRIMARY KEY,
     ""created_at"" TIMESTAMPTZ NOT NULL,

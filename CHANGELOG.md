@@ -85,6 +85,10 @@
 * Update all the dependencies
 * Extend `HandleAsync` method of `ICommandHandler<TCommand>` to include `IDictionary<string, string> headers`
 
+## 0.0.34
+* BREAKING CHANGES
+* Update all the dependencies
+* Add schedma cretaion ability to PostgreSQL and MSSQL
 
 
 [Danielovich]: https://github.com/Danielovich

@@ -99,9 +99,15 @@ class MsSqlOutboxCommandStore(string connectionString, string tableName, string 
 
         using var command = connection.CreateCommand();
 
+        // using EXEC here, because schema creation must be executed in its own batch
         command.CommandText = $@"
 
-IF NOT EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}') 
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{schemaName}')
+BEGIN
+    EXEC('CREATE SCHEMA [{schemaName}]')
+END
+
+IF NOT EXISTS (SELECT TOP 1 * FROM sys.tables t JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = '{tableName}' AND s.name = '{schemaName}')
 BEGIN
     CREATE TABLE [{schemaName}].[{tableName}] (
         [Id] UNIQUEIDENTIFIER,
