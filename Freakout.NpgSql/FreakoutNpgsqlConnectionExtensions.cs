@@ -87,7 +87,7 @@ public static class FreakoutNpgsqlConnectionExtensions
     {
         cmd.CommandText = $@"INSERT INTO ""{schemaName}"".""{tableName}"" (""id"", ""created_at"", ""headers"", ""payload"") VALUES (@id, CURRENT_TIMESTAMP, @headers, @payload);";
 
-        cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = SequentialGuidGenerator.Instance.NewGuid() });
+        cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlDbType.Uuid) { Value = GuidV7.NewGuid() });
         cmd.Parameters.Add(new NpgsqlParameter("headers", NpgsqlDbType.Jsonb) { Value = headers });
         cmd.Parameters.Add(new NpgsqlParameter("payload", NpgsqlDbType.Bytea) { Value = bytes });
     }

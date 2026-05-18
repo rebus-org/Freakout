@@ -27,8 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="sequentialguid" Version="4.0.6" />
-		<PackageReference Include="marten" Version="8.18.1" />
+		<PackageReference Include="sequentialguid" Version="6.1.0" />
+		<PackageReference Include="marten" Version="8.37.0" />
 	</ItemGroup>
 
 </Project>

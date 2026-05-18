@@ -39,7 +39,7 @@ public static class MartenOutboxExtensions
 
             var serializedHeaders = HeaderSerializer.SerializeToString(headersToUse);
 
-            session.QueueSqlCommand(sql, SequentialGuidGenerator.Instance.NewGuid(), serializedHeaders, payload);
+            session.QueueSqlCommand(sql, GuidV7.NewGuid(), serializedHeaders, payload);
         }
 
         static void InsertInto(Dictionary<string, string> source, Dictionary<string, string> target)
