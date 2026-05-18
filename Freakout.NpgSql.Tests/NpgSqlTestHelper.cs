@@ -16,7 +16,7 @@ class NpgsqlTestHelper
         var connectionString = Environment.GetEnvironmentVariable("NPGSQL_TEST_CONNECTIONSTRING");
         if (!string.IsNullOrWhiteSpace(connectionString)) return connectionString;
 
-        var builder = new PostgreSqlBuilder();
+        var builder = new PostgreSqlBuilder("postgres:18");
         var container = builder.Build();
 
         container.StartAsync().WaitAndUnwrapException();

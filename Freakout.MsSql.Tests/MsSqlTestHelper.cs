@@ -16,7 +16,7 @@ class MsSqlTestHelper
         var connectionString = Environment.GetEnvironmentVariable("MSSQL_TEST_CONNECTIONSTRING");
         if (!string.IsNullOrWhiteSpace(connectionString)) return connectionString;
 
-        var builder = new MsSqlBuilder();
+        var builder = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04");
         var container = builder.Build();
 
         container.StartAsync().WaitAndUnwrapException();
