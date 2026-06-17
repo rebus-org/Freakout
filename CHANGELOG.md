@@ -88,7 +88,10 @@
 ## 0.0.34
 * BREAKING CHANGES
 * Update all the dependencies
-* Add schema cretaion ability to PostgreSQL and MSSQL
+* Add schema creation ability to PostgreSQL and MSSQL
+
+## 0.0.35
+* Update all the dependencies
 
 
 [Danielovich]: https://github.com/Danielovich
