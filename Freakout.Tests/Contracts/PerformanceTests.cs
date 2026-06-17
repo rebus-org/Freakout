@@ -25,7 +25,8 @@ public abstract class PerformanceTests<TFreakoutSystemFactory> : FixtureBase whe
         _factory = Using(new TFreakoutSystemFactory());
     }
 
-    [TestCase(arg: 10)]
+    [TestCase(10)]
+    [TestCase(100)]
     public async Task RunTest(int count)
     {
         var stop = Using(disposable: new CancellationTokenSource());
@@ -49,7 +50,7 @@ public abstract class PerformanceTests<TFreakoutSystemFactory> : FixtureBase whe
         foreach (var command in commands)
         {
             messageIds[command.Id] = false;
-            await outbox.AddOutboxCommandAsync(command: command);
+            await outbox.AddOutboxCommandAsync(command: command, cancellationToken: CancellationToken.None);
         }
 
         scope.Complete();

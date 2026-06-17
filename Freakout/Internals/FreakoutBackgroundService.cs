@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -36,23 +37,29 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispa
 
                 logger.LogDebug("Polling store");
 
-                try
+                while (configuration.ContinuousCommandProcessing)
                 {
-                    using var batch = await store.GetPendingOutboxCommandsAsync(configuration.CommandProcessingBatchSize, stoppingToken);
-                    using var scope = new FreakoutContextScope(batch.FreakoutContext);
+                    try
+                    {
+                        using var batch = await store.GetPendingOutboxCommandsAsync(configuration.CommandProcessingBatchSize, stoppingToken);
 
-                    await dispatcher.ExecuteAsync(batch, stoppingToken);
+                        if (!batch.Any()) break;
 
-                    await batch.CompleteAsync(stoppingToken);
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    // don't catch this
-                    throw;
-                }
-                catch (Exception exception)
-                {
-                    logger.LogError(exception, "Error when executing store commands");
+                        using var scope = new FreakoutContextScope(batch.FreakoutContext);
+
+                        await dispatcher.ExecuteAsync(batch, stoppingToken);
+
+                        await batch.CompleteAsync(stoppingToken);
+                    }
+                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                    {
+                        // don't catch this
+                        throw;
+                    }
+                    catch (Exception exception)
+                    {
+                        logger.LogError(exception, "Error when executing store commands");
+                    }
                 }
             }
         }

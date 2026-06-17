@@ -35,6 +35,11 @@ public abstract class FreakoutConfiguration
     public int CommandProcessingBatchSize { get; set; } = 1;
 
     /// <summary>
+    /// Configures whether command processing will try to continue (i.e. process another command right away) after having processed a command batch with at least one command successfully.
+    /// </summary>
+    public bool ContinuousCommandProcessing { get; set; } = true;
+
+    /// <summary>
     /// Configures the command serializer. Defaults to <see cref="SystemTextJsonCommandSerializer"/> which uses System.Text.Json to serialize commands.
     /// </summary>
     public ICommandSerializer CommandSerializer { get; set; } = new SystemTextJsonCommandSerializer();
