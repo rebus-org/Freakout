@@ -94,4 +94,7 @@
 * Update all the dependencies
 * Introduce concept of "continuous command processing", which means that a successfully handled batch containing at least 1 command will be followed by an immediate poll of the command store. Defaults to true
 
+## 0.0.36
+* Update all the dependencies because that's how we roll
+
 [Danielovich]: https://github.com/Danielovich
