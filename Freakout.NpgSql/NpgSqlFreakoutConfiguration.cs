@@ -15,7 +15,7 @@ public class NpgsqlFreakoutConfiguration(string connectionString) : FreakoutConf
     public string SchemaName { get; set; } = "public";
 
     /// <summary>
-    /// Configures the store table name. Defaults to "OutboxCommands".
+    /// Configures the store table name. Defaults to "outbox_commands".
     /// </summary>
     public string TableName { get; set; } = "outbox_commands";
 
