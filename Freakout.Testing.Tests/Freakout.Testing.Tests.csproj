@@ -10,10 +10,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.net.test.sdk" Version="18.9.0" />
+		<PackageReference Include="microsoft.net.test.sdk" Version="18.10.0" />
 		<PackageReference Include="nunit" Version="4.6.1" />
 		<PackageReference Include="testy" Version="0.10.0" />
-		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="10.0.11" />
+		<PackageReference Include="microsoft.extensions.dependencyinjection" Version="10.0.12" />
 	</ItemGroup>
 
 </Project>
