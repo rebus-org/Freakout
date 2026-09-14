@@ -4,7 +4,6 @@ using Freakout.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Testy;
-using Testy.Extensions;
 
 namespace Freakout.Testing.Tests;
 

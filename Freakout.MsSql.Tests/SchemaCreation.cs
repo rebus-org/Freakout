@@ -1,12 +1,10 @@
 ﻿using Freakout.Config;
-using Freakout.MsSql.Internals;
 using Freakout.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Testy;
 using Testy.General;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Freakout.MsSql.Tests;
 

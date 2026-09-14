@@ -100,4 +100,8 @@
 ## 0.0.37
 * Update all the dependencies because that's how we roll
 
+## 0.0.38
+* Update some dependencies
+* Minor tweaks
+
 [Danielovich]: https://github.com/Danielovich

@@ -24,6 +24,11 @@ class DefaultBatchDispatcher(ICommandDispatcher commandDispatcher, ILogger<Defau
 
                 logger.LogDebug("Successfully executed store command {command}", command);
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // just let it bubble out
+                throw;
+            }
             catch (Exception exception)
             {
                 command.SetState(new FailedCommandState(stopwatch.Elapsed, exception));

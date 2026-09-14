@@ -12,7 +12,7 @@ namespace Freakout.Internals;
 
 class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispatcher dispatcher, IOutboxCommandStore store, ILogger<FreakoutBackgroundService> logger) : BackgroundService
 {
-    readonly AsyncAutoResetEvent AutoResetEvent = new();
+    readonly AsyncAutoResetEvent _autoResetEvent = new();
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -25,7 +25,7 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispa
         timer.Elapsed += (_, _) =>
         {
             logger.LogDebug("Triggering store poll");
-            AutoResetEvent.Set();
+            _autoResetEvent.Set();
         };
         timer.Start();
 
@@ -33,33 +33,40 @@ class FreakoutBackgroundService(FreakoutConfiguration configuration, IBatchDispa
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await AutoResetEvent.WaitAsync(stoppingToken);
+                await _autoResetEvent.WaitAsync(stoppingToken);
 
-                logger.LogDebug("Polling store");
-
-                while (configuration.ContinuousCommandProcessing)
+                try
                 {
-                    try
+                    logger.LogDebug("Polling store");
+
+                    using var batch = await store.GetPendingOutboxCommandsAsync(configuration.CommandProcessingBatchSize, stoppingToken);
+
+                    // if there were no commands, quit processing this time around
+                    if (!batch.Any())
                     {
-                        using var batch = await store.GetPendingOutboxCommandsAsync(configuration.CommandProcessingBatchSize, stoppingToken);
-
-                        if (!batch.Any()) break;
-
-                        using var scope = new FreakoutContextScope(batch.FreakoutContext);
-
-                        await dispatcher.ExecuteAsync(batch, stoppingToken);
-
-                        await batch.CompleteAsync(stoppingToken);
+                        continue;
                     }
-                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+
+                    using var scope = new FreakoutContextScope(batch.FreakoutContext);
+
+                    await dispatcher.ExecuteAsync(batch, stoppingToken);
+
+                    await batch.CompleteAsync(stoppingToken);
+
+                    // if we're running in continuous mode, signal that we must poll again
+                    if (configuration.ContinuousCommandProcessing)
                     {
-                        // don't catch this
-                        throw;
+                        _autoResetEvent.Set();
                     }
-                    catch (Exception exception)
-                    {
-                        logger.LogError(exception, "Error when executing store commands");
-                    }
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    // don't catch this
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    logger.LogError(exception, "Error when executing store commands");
                 }
             }
         }

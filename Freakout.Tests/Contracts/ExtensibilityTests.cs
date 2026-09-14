@@ -8,10 +8,10 @@ using NUnit.Framework;
 using Polly;
 using Polly.Retry;
 using Testy;
-using Testy.Extensions;
 using Testy.General;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable AccessToDisposedClosure
+// ReSharper disable AsyncMethodWithoutAwait
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Freakout.Tests.Contracts;
@@ -80,12 +80,12 @@ public abstract class ExtensibilityTests<TFreakoutSystemFactory> : FixtureBase w
 
     class PollyCommandDispatcher(ICommandDispatcher commandDispatcher) : ICommandDispatcher
     {
-        readonly AsyncRetryPolicy RetryPolicy = Policy.Handle<Exception>(e => e is not OperationCanceledException)
+        readonly AsyncRetryPolicy _retryPolicy = Policy.Handle<Exception>(e => e is not OperationCanceledException)
             .WaitAndRetryAsync(10, n => TimeSpan.FromMilliseconds(n * 2));
 
         public async Task ExecuteAsync(OutboxCommand outboxCommand, CancellationToken cancellationToken = default)
         {
-            await RetryPolicy.ExecuteAsync(
+            await _retryPolicy.ExecuteAsync(
                 action: token => commandDispatcher.ExecuteAsync(outboxCommand, token),
                 cancellationToken: cancellationToken
             );
