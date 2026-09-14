@@ -28,6 +28,10 @@ public abstract class AbstractFreakoutSystemFactory : IFreakoutSystemFactory
         return GetFreakoutSystem(provider);
     }
 
+    public abstract FreakoutConfiguration GetConfiguration(Action<FreakoutConfiguration> configure = null);
+    
+    public abstract FreakoutContextWrapper CreateContextWrapper();
+
     protected abstract FreakoutSystem GetFreakoutSystem(ServiceProvider provider);
 
     protected abstract void ConfigureServices(IServiceCollection services);

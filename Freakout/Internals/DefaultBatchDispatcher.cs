@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Freakout.Internals;
 
-class DefaultBatchDispatcher(ICommandDispatcher commandDispatcher, ILogger<DefaultBatchDispatcher> logger) : IBatchDispatcher
+class DefaultBatchDispatcher(FreakoutConfiguration configuration, ICommandDispatcher commandDispatcher, ILogger<DefaultBatchDispatcher> logger) : IBatchDispatcher
 {
     public async Task ExecuteAsync(OutboxCommandBatch batch, CancellationToken cancellationToken = default)
     {
@@ -18,11 +18,16 @@ class DefaultBatchDispatcher(ICommandDispatcher commandDispatcher, ILogger<Defau
 
             try
             {
-                await commandDispatcher.ExecuteAsync(command, cancellationToken);
+                using var timeout = new CancellationTokenSource(configuration.CommandProcessingTimeout);
+                using var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken);
+
+                var token = combined.Token;
+
+                await commandDispatcher.ExecuteAsync(command, token);
 
                 command.SetState(new SuccessfullyExecutedCommandState(stopwatch.Elapsed));
 
-                logger.LogDebug("Successfully executed store command {command}", command);
+                logger.LogDebug("Successfully executed command with ID {commandId}", command.Id);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -33,7 +38,7 @@ class DefaultBatchDispatcher(ICommandDispatcher commandDispatcher, ILogger<Defau
             {
                 command.SetState(new FailedCommandState(stopwatch.Elapsed, exception));
 
-                throw new ApplicationException($"Could not execute command {command}", exception);
+                throw new ApplicationException($"Could not execute command with ID {command.Id}", exception);
             }
         }
     }

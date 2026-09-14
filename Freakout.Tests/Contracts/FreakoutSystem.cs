@@ -5,13 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Freakout.Tests.Contracts;
 
-public class FreakoutSystem(ServiceProvider ServiceProvider, Func<IFreakoutContext> contextFactory, Action<IFreakoutContext> commitAction, Action<IFreakoutContext> disposeAction)
+public class FreakoutSystem(ServiceProvider serviceProvider, Func<IFreakoutContext> contextFactory, Action<IFreakoutContext> commitAction, Action<IFreakoutContext> disposeAction)
 {
-    public IOutbox Outbox => ServiceProvider.GetRequiredService<IOutbox>();
+    public IOutbox Outbox => serviceProvider.GetRequiredService<IOutbox>();
 
-    public IOutboxCommandStore OutboxCommandStore => ServiceProvider.GetRequiredService<IOutboxCommandStore>();
+    public IOutboxCommandStore OutboxCommandStore => serviceProvider.GetRequiredService<IOutboxCommandStore>();
     
-    public ICommandSerializer CommandSerializer => ServiceProvider.GetRequiredService<ICommandSerializer>();
+    public ICommandSerializer CommandSerializer => serviceProvider.GetRequiredService<ICommandSerializer>();
 
     public FreakoutTestScope CreateScope() => new(contextFactory(), commitAction, disposeAction);
 
@@ -30,6 +30,6 @@ public class FreakoutSystem(ServiceProvider ServiceProvider, Func<IFreakoutConte
 
     public Task StartCommandProcessorAsync(CancellationToken stoppingToken)
     {
-        return ServiceProvider.RunBackgroundWorkersAsync(stoppingToken);
+        return serviceProvider.RunBackgroundWorkersAsync(stoppingToken);
     }
 }

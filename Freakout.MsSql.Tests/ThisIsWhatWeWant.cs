@@ -38,10 +38,15 @@ public class ThisIsWhatWeWant : FixtureBase
         using var cancellationTokenSource = new CancellationTokenSource();
         _ = provider.RunBackgroundWorkersAsync(cancellationTokenSource.Token);
 
-        // in our app we sometimes execute SQL stuff like this
-        await AddOutboxCommandAsync(configuration, new PrintTextOutboxCommand(Text: "Howdy!"));
-
-        await cancellationTokenSource.CancelAsync();
+        try
+        {
+            // in our app we sometimes execute SQL stuff like this
+            await AddOutboxCommandAsync(configuration, new PrintTextOutboxCommand(Text: "Howdy!"));
+        }
+        finally
+        {
+            await cancellationTokenSource.CancelAsync();
+        }
     }
 
     async Task AddOutboxCommandAsync(MsSqlFreakoutConfiguration configuration, object command)

@@ -1,4 +1,5 @@
 ﻿using Freakout.Config;
+using Freakout.Tests;
 using Freakout.Tests.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -12,7 +13,7 @@ public class NpgsqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
 {
     protected override void ConfigureServices(IServiceCollection services)
     {
-        var tableName = $"outbox-{Guid.NewGuid():N}";
+        var tableName = $"outbox_{Guid.NewGuid():N}";
 
         disposables.Add(new DisposableCallback(() => NpgsqlTestHelper.DropTable(tableName)));
 
@@ -23,6 +24,49 @@ public class NpgsqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
         };
 
         services.AddFreakout(configuration);
+    }
+
+    public override FreakoutConfiguration GetConfiguration(Action<FreakoutConfiguration> configure = null)
+    {
+        var tableName = $"outbox_{Guid.NewGuid():N}";
+
+        var configuration = new NpgsqlFreakoutConfiguration(NpgsqlTestHelper.ConnectionString);
+
+        configure?.Invoke(configuration);
+
+        disposables.Add(new DisposableCallback(() => NpgsqlTestHelper.DropTable(configuration.TableName)));
+
+        return configuration;
+    }
+
+    public override FreakoutContextWrapper CreateContextWrapper()
+    {
+        var connection = new NpgsqlConnection(NpgsqlTestHelper.ConnectionString);
+        connection.Open();
+
+        try
+        {
+            var transaction = connection.BeginTransaction();
+            var context = new NpgsqlFreakoutContext(connection, transaction);
+
+            async Task CommitAsync(CancellationToken cancellationToken)
+            {
+                await transaction.CommitAsync(cancellationToken);
+            }
+
+            void Dispose()
+            {
+                transaction.Dispose();
+                connection.Dispose();
+            }
+
+            return new GenericFreakoutContextWrapper(context, CommitAsync, Dispose);
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
     }
 
     protected override FreakoutSystem GetFreakoutSystem(ServiceProvider provider)

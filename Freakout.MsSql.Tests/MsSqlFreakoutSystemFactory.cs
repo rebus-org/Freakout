@@ -1,4 +1,5 @@
 ﻿using Freakout.Config;
+using Freakout.Tests;
 using Freakout.Tests.Contracts;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,52 @@ public class MsSqlFreakoutSystemFactory : AbstractFreakoutSystemFactory
         };
 
         services.AddFreakout(configuration);
+    }
+
+    public override FreakoutConfiguration GetConfiguration(Action<FreakoutConfiguration> configure = null)
+    {
+        var tableName = $"outbox-{Guid.NewGuid():N}";
+
+        var configuration = new MsSqlFreakoutConfiguration(MsSqlTestHelper.ConnectionString)
+        {
+            TableName = tableName
+        };
+
+        configure?.Invoke(configuration);
+
+        disposables.Add(new DisposableCallback(() => MsSqlTestHelper.DropTable(configuration.TableName)));
+
+        return configuration;
+    }
+
+    public override FreakoutContextWrapper CreateContextWrapper()
+    {
+        var connection = new SqlConnection(MsSqlTestHelper.ConnectionString);
+        connection.Open();
+
+        try
+        {
+            var transaction = connection.BeginTransaction();
+            var context = new MsSqlFreakoutContext(connection, transaction);
+
+            async Task CommitAsync(CancellationToken cancellationToken)
+            {
+                await transaction.CommitAsync(cancellationToken);
+            }
+
+            void Dispose()
+            {
+                transaction.Dispose();
+                connection.Dispose();
+            }
+
+            return new GenericFreakoutContextWrapper(context, CommitAsync, Dispose);
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
     }
 
     protected override FreakoutSystem GetFreakoutSystem(ServiceProvider provider)

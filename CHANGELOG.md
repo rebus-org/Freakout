@@ -103,5 +103,7 @@
 ## 0.0.38
 * Update some dependencies
 * Minor tweaks
+* Enable command execution timeout and add to configuration
+* Build better foundation for integration tests
 
 [Danielovich]: https://github.com/Danielovich

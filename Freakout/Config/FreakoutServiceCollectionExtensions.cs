@@ -7,6 +7,9 @@ using Freakout.Internals;
 using Freakout.Internals.Dispatchers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
 // ReSharper disable SimplifyLinqExpressionUseAll
 
 namespace Freakout.Config;
@@ -24,7 +27,14 @@ public static class FreakoutServiceCollectionExtensions
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        services.AddSingleton(configuration);
+        services.AddSingleton(p =>
+        {
+            var logger = p.GetService<ILoggerFactory>()?.CreateLogger(typeof(FreakoutConfiguration)) ?? NullLogger.Instance;
+
+            logger.LogInformation("Initializing Freakout with configuration {@configuration}", configuration);
+
+            return configuration;
+        });
 
         services.AddHostedService(p =>
         {
@@ -43,6 +53,7 @@ public static class FreakoutServiceCollectionExtensions
         services.TryAddSingleton<ICommandDispatcher, IlEmitCommandDispatcher>();
 
         services.TryAddSingleton<IBatchDispatcher>(p => new DefaultBatchDispatcher(
+            configuration: p.GetRequiredService<FreakoutConfiguration>(),
             commandDispatcher: p.GetRequiredService<ICommandDispatcher>(),
             logger: p.GetLoggerFor<DefaultBatchDispatcher>()
         ));

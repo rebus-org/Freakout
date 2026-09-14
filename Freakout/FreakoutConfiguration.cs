@@ -25,17 +25,23 @@ public abstract class FreakoutConfiguration
     protected abstract void ConfigureServices(IServiceCollection services);
 
     /// <summary>
-    /// Configures the poll interval, i.e. how long to wait between polling the store for pending commands.
+    /// Configures the poll interval, i.e. how long to wait between polling the store for pending commands. Defaults to 1 minute.
     /// </summary>
     public TimeSpan OutboxPollInterval { get; set; } = TimeSpan.FromMinutes(1);
 
     /// <summary>
-    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch.
+    /// Configures the command processing timeout, i.e. how long to wait before cancelling the execution of a command. Defaults to 1 minute.
+    /// </summary>
+    public TimeSpan CommandProcessingTimeout { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// <summary>
+    /// Configures the command processing batch size, i.e. how many outbox commands to fetch, execute, and complete per batch. Defaults to 1.
     /// </summary>
     public int CommandProcessingBatchSize { get; set; } = 1;
 
     /// <summary>
-    /// Configures whether command processing will try to continue (i.e. process another command right away) after having processed a command batch with at least one command successfully.
+    /// Configures whether command processing will try to continue (i.e. process another command right away) after having processed a command batch
+    /// with at least one command successfully. Defaults to true.
     /// </summary>
     public bool ContinuousCommandProcessing { get; set; } = true;
 
